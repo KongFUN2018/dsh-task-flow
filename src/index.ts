@@ -132,3 +132,8 @@ export { default as EditLockService } from './edit-lock/index.ts'
 // domains plus published @deepseek-ai session/storage-domain peers.
 export * from './task-local/index.ts'
 export { default as LocalTaskService } from './task-local/index.ts'
+
+// Tool-task-create domain (folded from packages/task-flow/tool-task-create); a
+// plugin `apply` registration, depends on the recipe domain plus published
+// @deepseek-ai tools peer.
+export * from './tool-task-create/index.ts'
