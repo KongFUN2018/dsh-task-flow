@@ -9,6 +9,7 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-client-ui-tool/client'
+import type { TaskMutationContext } from '../../../task/types.ts'
 import { TaskCreateProposalView, type TaskCreateProposalViewData } from './TaskCreateProposalView.tsx'
 import { en, NS, zh, type UiTaskCreateConfirmKey } from './locales.ts'
 
@@ -33,10 +34,21 @@ export function apply(ctx: ClientContext): void {
   }, TaskCreateProposalView))
 }
 
-/** Issue the create through the tasks Remote; the proposal carries the idempotency key. */
+/** Issue the create through the tasks Remote, then start it so the engine schedules it. */
 async function confirmTask(ctx: ClientContext, proposal: TaskCreateProposalViewData, inherit: boolean): Promise<string> {
   void inherit
   const result = await ctx.remote.tasks.createTask(proposal.recipeId, 'default', 'workbench-ui', proposal.idempotencyKey)
   if (!result.ok) throw new Error('create failed: ' + result.error.code)
-  return String(result.value.taskId)
+  const task = result.value
+  // A freshly created task sits in `planning`; the engine only schedules
+  // `running` tasks, so start it immediately — otherwise it spins forever.
+  const start: TaskMutationContext = {
+    actor: 'workbench-ui',
+    reason: 'auto-start after create',
+    expectedRevision: task.revision,
+    idempotencyKey: proposal.idempotencyKey + '-start',
+  }
+  const started = await ctx.remote.tasks.startTask(String(task.taskId), start)
+  if (!started.ok) throw new Error('start failed: ' + started.error.code)
+  return String(task.taskId)
 }

@@ -9,6 +9,7 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type { RecipeRevision } from '../../../recipe/types.ts'
+import type { TaskMutationContext } from '../../../task/types.ts'
 
 /** Lifecycle of the recipe-catalogue load. */
 export type CreateStatus = 'loading' | 'ready' | 'failed'
@@ -66,7 +67,18 @@ export class TaskCreateController {
     const recipe = this.store.getSnapshot().recipes.find(item => item.recipeId === recipeId)
     if (recipe === undefined) throw new Error('recipe "' + recipeId + '" is not in the catalogue')
     const result = await this.ctx.remote.tasks.createTask(recipeId, workspaceId, actor, nextIdempotencyKey(recipeId))
-    if (result.ok) return String(result.value.taskId)
-    throw new Error('create failed: ' + result.error.code)
+    if (!result.ok) throw new Error('create failed: ' + result.error.code)
+    const task = result.value
+    // A freshly created task sits in `planning`; the engine only schedules
+    // `running` tasks, so start it immediately — otherwise it spins forever.
+    const start: TaskMutationContext = {
+      actor,
+      reason: 'auto-start after create',
+      expectedRevision: task.revision,
+      idempotencyKey: nextIdempotencyKey(recipeId + '-start'),
+    }
+    const started = await this.ctx.remote.tasks.startTask(String(task.taskId), start)
+    if (!started.ok) throw new Error('start failed: ' + started.error.code)
+    return String(task.taskId)
   }
 }
