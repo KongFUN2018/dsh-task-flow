@@ -9,7 +9,6 @@
 // @deepseek-ai peer packages, so it validates the standalone build pipeline
 // before the internal-dep host domains fold in.
 export * from './recipe/index.ts'
-export { default } from './recipe/index.ts'
 
 // Task domain (folded from packages/task-flow/task). Its only intra-fold
 // dependency is recipe, rewritten to relative ../recipe imports.
@@ -143,3 +142,12 @@ export * from './tool-task-create/index.ts'
 // @deepseek-ai typert-protocol peers.
 export * from './workbench/host-stream/index.ts'
 export { default as WorkbenchHostStreamService } from './workbench/host-stream/index.ts'
+
+// Unified host-half assembly plugin. Re-exported here so the package main
+// exposes `name`/`inject`/`apply` for `dsh web`'s Loader, which unwraps the
+// main with `exports.default ?? exports`. The root barrel intentionally has
+// NO default export: `export { default } from './recipe/index.ts'` was the
+// only one and is gone, so unwrapExports returns this namespace instead of
+// collapsing onto RecipeRegistry.
+export { name, inject, apply } from './plugin.ts'
+

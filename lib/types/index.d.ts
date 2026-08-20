@@ -4,7 +4,6 @@
  * @module @kongfun2018/dsh-task-flow
  */
 export * from './recipe/index.ts';
-export { default } from './recipe/index.ts';
 export * from './task/index.ts';
 export { default as TaskHandle } from './task/index.ts';
 export * from './workbench/journal/index.ts';
@@ -40,4 +39,5 @@ export { default as LocalTaskService } from './task-local/index.ts';
 export * from './tool-task-create/index.ts';
 export * from './workbench/host-stream/index.ts';
 export { default as WorkbenchHostStreamService } from './workbench/host-stream/index.ts';
+export { name, inject, apply } from './plugin.ts';
 //# sourceMappingURL=index.d.ts.map
