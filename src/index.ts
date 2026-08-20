@@ -10,3 +10,8 @@
 // before the internal-dep host domains fold in.
 export * from './recipe/index.ts'
 export { default } from './recipe/index.ts'
+
+// Task domain (folded from packages/task-flow/task). Its only intra-fold
+// dependency is recipe, rewritten to relative ../recipe imports.
+export * from './task/index.ts'
+export { default as TaskHandle } from './task/index.ts'
