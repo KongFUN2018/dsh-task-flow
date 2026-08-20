@@ -66,3 +66,9 @@ export { default as RecipeMultiphaseService } from './recipe-multiphase/index.ts
 // @deepseek-ai llm/session/storage-domain/typert-protocol/brand peers.
 export * from './clarification/index.ts'
 export { default as ClarificationService } from './clarification/index.ts'
+
+// Rewind domain (folded from packages/task-flow/rewind); depends on task,
+// attention, deliverable, and workbench-journal domains plus published
+// @deepseek-ai typert-protocol peers.
+export * from './rewind/index.ts'
+export { default as RewindService } from './rewind/index.ts'

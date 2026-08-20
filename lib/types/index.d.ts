@@ -22,4 +22,6 @@ export * from './recipe-multiphase/index.ts';
 export { default as RecipeMultiphaseService } from './recipe-multiphase/index.ts';
 export * from './clarification/index.ts';
 export { default as ClarificationService } from './clarification/index.ts';
+export * from './rewind/index.ts';
+export { default as RewindService } from './rewind/index.ts';
 //# sourceMappingURL=index.d.ts.map
