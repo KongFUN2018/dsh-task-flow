@@ -12,4 +12,6 @@ export { default as WorkbenchJournalService } from './workbench/journal/index.ts
 export * from './attention/index.ts';
 export { default as AttentionService } from './attention/index.ts';
 export { ImpactSnapshotId, deliverableLocalDomainSpec, deliverableVersionSchema, phaseInputsSchema, DeliverableError, DeliverableService, } from './deliverable/index.ts';
+export * from './review-policy/index.ts';
+export { default as ReviewPolicyService } from './review-policy/index.ts';
 //# sourceMappingURL=index.d.ts.map

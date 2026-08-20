@@ -39,3 +39,8 @@ export {
   DeliverableError,
   DeliverableService,
 } from './deliverable/index.ts'
+
+// Review-policy domain (folded from packages/task-flow/review-policy);
+// depends on task + attention + workbench-journal.
+export * from './review-policy/index.ts'
+export { default as ReviewPolicyService } from './review-policy/index.ts'
