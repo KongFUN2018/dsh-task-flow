@@ -55,3 +55,8 @@ export { default as GateService } from './gate/index.ts'
 // @deepseek-ai agent/goal/llm/session/storage-domain peers.
 export * from './recipe-engine-core/index.ts'
 export { default as RecipeEngineCore } from './recipe-engine-core/index.ts'
+
+// Recipe-multiphase domain (folded from packages/task-flow/recipe-multiphase);
+// depends on the folded recipe-engine-core domain.
+export * from './recipe-multiphase/index.ts'
+export { default as RecipeMultiphaseService } from './recipe-multiphase/index.ts'
