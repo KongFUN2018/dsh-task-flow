@@ -1,0 +1,1 @@
+{"version":3,"file":"types.js","sourceRoot":"","sources":["../../../../src/workbench/journal/types.ts"],"names":[],"mappings":"AAAA;;;;;;;GAOG;AAuEH,6CAA6C;AAC7C,MAAM,OAAO,YAAa,SAAQ,KAAK;IACrC,qCAAqC;IAC5B,IAAI,CAAkB;IAE/B;;;OAGG;IACH,YAAY,IAAsB,EAAE,OAAe;QACjD,KAAK,CAAC,OAAO,CAAC,CAAA;QACd,IAAI,CAAC,IAAI,GAAG,IAAI,CAAA;QAChB,IAAI,CAAC,IAAI,GAAG,cAAc,CAAA;IAC5B,CAAC;CACF"}

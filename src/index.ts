@@ -15,3 +15,8 @@ export { default } from './recipe/index.ts'
 // dependency is recipe, rewritten to relative ../recipe imports.
 export * from './task/index.ts'
 export { default as TaskHandle } from './task/index.ts'
+
+// Workbench journal domain (folded from packages/task-flow/workbench-journal),
+// base of the workbench group; depends only on the folded task domain.
+export * from './workbench/journal/index.ts'
+export { default as WorkbenchJournalService } from './workbench/journal/index.ts'
