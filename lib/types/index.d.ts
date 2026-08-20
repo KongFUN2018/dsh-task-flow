@@ -20,4 +20,6 @@ export * from './recipe-engine-core/index.ts';
 export { default as RecipeEngineCore } from './recipe-engine-core/index.ts';
 export * from './recipe-multiphase/index.ts';
 export { default as RecipeMultiphaseService } from './recipe-multiphase/index.ts';
+export * from './clarification/index.ts';
+export { default as ClarificationService } from './clarification/index.ts';
 //# sourceMappingURL=index.d.ts.map

@@ -60,3 +60,9 @@ export { default as RecipeEngineCore } from './recipe-engine-core/index.ts'
 // depends on the folded recipe-engine-core domain.
 export * from './recipe-multiphase/index.ts'
 export { default as RecipeMultiphaseService } from './recipe-multiphase/index.ts'
+
+// Clarification domain (folded from packages/task-flow/clarification);
+// depends on task, attention, and workbench-journal domains plus published
+// @deepseek-ai llm/session/storage-domain/typert-protocol/brand peers.
+export * from './clarification/index.ts'
+export { default as ClarificationService } from './clarification/index.ts'
