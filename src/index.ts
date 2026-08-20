@@ -126,3 +126,9 @@ export { default as ImpactPropagationService } from './impact/index.ts'
 // @deepseek-ai storage-domain/typert-protocol/brand peers.
 export * from './edit-lock/index.ts'
 export { default as EditLockService } from './edit-lock/index.ts'
+
+// Task-local domain (folded from packages/task-flow/task-local); the durable
+// TaskHandle implementation, depends on task, deliverable, and workbench-journal
+// domains plus published @deepseek-ai session/storage-domain peers.
+export * from './task-local/index.ts'
+export { default as LocalTaskService } from './task-local/index.ts'

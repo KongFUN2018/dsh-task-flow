@@ -35,4 +35,6 @@ export * from './impact/index.ts';
 export { default as ImpactPropagationService } from './impact/index.ts';
 export * from './edit-lock/index.ts';
 export { default as EditLockService } from './edit-lock/index.ts';
+export * from './task-local/index.ts';
+export { default as LocalTaskService } from './task-local/index.ts';
 //# sourceMappingURL=index.d.ts.map
