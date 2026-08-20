@@ -4,6 +4,13 @@
   gap: 8px;
 }
 
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+}
+
 .list {
   display: flex;
   flex-direction: column;

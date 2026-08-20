@@ -153,7 +153,7 @@ export function WorkbenchDrawer(props: WorkbenchDrawerProps) {
         </button>
       </div>
       <div className={css.tabs} role="tablist">
-        {(['tasks', 'taskList', 'recipeLibrary', 'inbox', 'clarifications', 'detail', 'create'] as const).map(key => (
+        {(['tasks', 'taskList', 'recipeLibrary', 'inbox', 'clarifications'] as const).map(key => (
           <button
             key={key}
             type="button"
@@ -166,6 +166,14 @@ export function WorkbenchDrawer(props: WorkbenchDrawerProps) {
           </button>
         ))}
       </div>
+      {tab === 'detail' || tab === 'create' ? (
+        <div className={css.drillBar}>
+          <button type="button" className={css.back} onClick={() => { actions.back() }}>
+            {t('back')}
+          </button>
+          <span className={css.drillTitle}>{t(`tab.${tab}` as const)}</span>
+        </div>
+      ) : null}
       <div className={css.body}>
         {tab === 'tasks' && renderSlot('workbench.drawer.tasks', owner)}
         {tab === 'taskList' && renderSlot('workbench.drawer.taskList', owner)}

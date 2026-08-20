@@ -6,7 +6,7 @@
 /** Namespace key of the drawer's dictionary. */
 export declare const NS: "workbenchDrawer";
 /** Dictionary keys the drawer registers. */
-export type WorkbenchDrawerKey = 'trigger' | 'tab.tasks' | 'tab.taskList' | 'tab.recipeLibrary' | 'tab.inbox' | 'tab.clarifications' | 'tab.create' | 'tab.detail' | 'close' | 'resize' | 'badge.open' | 'state.active' | 'state.idle' | 'detail.empty';
+export type WorkbenchDrawerKey = 'trigger' | 'tab.tasks' | 'tab.taskList' | 'tab.recipeLibrary' | 'tab.inbox' | 'tab.clarifications' | 'tab.create' | 'tab.detail' | 'back' | 'close' | 'resize' | 'badge.open' | 'state.active' | 'state.idle' | 'detail.empty';
 /** Chinese dictionary (product copy language). */
 export declare const zh: {
     readonly trigger: "任务流程";
@@ -17,6 +17,7 @@ export declare const zh: {
     readonly 'tab.clarifications': "澄清队列";
     readonly 'tab.create': "新建";
     readonly 'tab.detail': "详情";
+    readonly back: "返回";
     readonly close: "关闭";
     readonly resize: "拖动调整宽度";
     readonly 'badge.open': "{count} 项待处理";
@@ -34,6 +35,7 @@ export declare const en: {
     readonly 'tab.clarifications': "Clarifications";
     readonly 'tab.create': "Create";
     readonly 'tab.detail': "Detail";
+    readonly back: "Back";
     readonly close: "Close";
     readonly resize: "Drag to resize";
     readonly 'badge.open': "{count} items pending";

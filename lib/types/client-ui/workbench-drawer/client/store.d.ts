@@ -19,6 +19,7 @@ export type WorkbenchActions = {
     setDetailTaskId: (d: WorkbenchState, taskId: string | undefined) => void;
     openCreate: (d: WorkbenchState, recipeId?: string) => void;
     setCreateRecipeId: (d: WorkbenchState, recipeId: string | undefined) => void;
+    back: (d: WorkbenchState) => void;
 };
 /** Drawer UI state shared between the trigger button and the panel. */
 export type WorkbenchState = {
@@ -30,6 +31,8 @@ export type WorkbenchState = {
     detailTaskId: string | undefined;
     /** The recipe the create tab should pre-select, or undefined for a free pick. */
     createRecipeId: string | undefined;
+    /** The browsing tab to return to after a drill-in (detail) or create closes. */
+    returnTab: DrawerTab;
 };
 /**
  * Create the shared drawer interaction store handle.

@@ -16,6 +16,7 @@ export declare const zh: {
     readonly synced: "已同步 · {time}";
     readonly loading: "加载中…";
     readonly empty: "暂无任务";
+    readonly create: "新建任务";
     readonly 'error.load': "加载失败：{code}";
     readonly 'error.command': "操作失败：{code}，已重新同步";
     readonly revision: "版本 {revision}";

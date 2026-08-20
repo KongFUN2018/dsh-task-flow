@@ -21,6 +21,7 @@ export type WorkbenchActions = {
   setDetailTaskId: (d: WorkbenchState, taskId: string | undefined) => void
   openCreate: (d: WorkbenchState, recipeId?: string) => void
   setCreateRecipeId: (d: WorkbenchState, recipeId: string | undefined) => void
+  back: (d: WorkbenchState) => void
 }
 
 /** Drawer UI state shared between the trigger button and the panel. */
@@ -33,6 +34,8 @@ export type WorkbenchState = {
   detailTaskId: string | undefined
   /** The recipe the create tab should pre-select, or undefined for a free pick. */
   createRecipeId: string | undefined
+  /** The browsing tab to return to after a drill-in (detail) or create closes. */
+  returnTab: DrawerTab
 }
 
 /**
@@ -41,16 +44,17 @@ export type WorkbenchState = {
  */
 export function createWorkbenchStore(): EngineStoreHandle<WorkbenchState, WorkbenchActions> {
   return defineStore({
-    init: (): WorkbenchState => ({ open: false, tab: 'tasks', detailTaskId: undefined, createRecipeId: undefined }),
+    init: (): WorkbenchState => ({ open: false, tab: 'tasks', detailTaskId: undefined, createRecipeId: undefined, returnTab: 'tasks' }),
     actions: {
       openDrawer: (d) => { d.open = true },
       closeDrawer: (d) => { d.open = false },
       toggleDrawer: (d) => { d.open = !d.open },
-      selectTab: (d, tab: DrawerTab) => { d.tab = tab },
-      openDetail: (d, taskId: string) => { d.tab = 'detail'; d.detailTaskId = taskId },
+      selectTab: (d, tab: DrawerTab) => { d.tab = tab; d.returnTab = tab },
+      openDetail: (d, taskId: string) => { d.returnTab = d.tab; d.tab = 'detail'; d.detailTaskId = taskId },
       setDetailTaskId: (d, taskId: string | undefined) => { d.detailTaskId = taskId },
-      openCreate: (d, recipeId?: string) => { d.tab = 'create'; d.createRecipeId = recipeId },
+      openCreate: (d, recipeId?: string) => { d.returnTab = d.tab; d.tab = 'create'; d.createRecipeId = recipeId },
       setCreateRecipeId: (d, recipeId: string | undefined) => { d.createRecipeId = recipeId },
+      back: (d) => { d.tab = d.returnTab },
     },
   })
 }

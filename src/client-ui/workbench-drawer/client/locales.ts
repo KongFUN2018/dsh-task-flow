@@ -17,6 +17,7 @@ export type WorkbenchDrawerKey =
   | 'tab.clarifications'
   | 'tab.create'
   | 'tab.detail'
+  | 'back'
   | 'close'
   | 'resize'
   | 'badge.open'
@@ -34,6 +35,7 @@ export const zh = {
   'tab.clarifications': '澄清队列',
   'tab.create': '新建',
   'tab.detail': '详情',
+  'back': '返回',
   'close': '关闭',
   'resize': '拖动调整宽度',
   'badge.open': '{count} 项待处理',
@@ -52,6 +54,7 @@ export const en = {
   'tab.clarifications': 'Clarifications',
   'tab.create': 'Create',
   'tab.detail': 'Detail',
+  'back': 'Back',
   'close': 'Close',
   'resize': 'Drag to resize',
   'badge.open': '{count} items pending',

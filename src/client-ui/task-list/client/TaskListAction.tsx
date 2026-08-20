@@ -146,7 +146,7 @@ function TaskRow({ task, progress, gate, activity, t, onCommand, onOpen }: {
  * @returns the task list panel filling the drawer's tab body.
  */
 export function TaskListAction(props: TaskListActionProps) {
-  const { openDetail, t, useList, refresh, command } = props
+  const { openDetail, openCreate, t, useList, refresh, command } = props
   const list = useList(state => state)
   // Refresh is an explicit user gesture: the button shows a brief ongoing
   // state, then a "synced" confirmation, so a click that re-reads unchanged
@@ -164,6 +164,11 @@ export function TaskListAction(props: TaskListActionProps) {
   }
   return (
     <div className={css.panel}>
+      <div className={css.head}>
+        <Button size="sm" variant="primary" onClick={() => { openCreate() }}>
+          {t('create')}
+        </Button>
+      </div>
       {list.status === 'loading' && <p className={css.statusLine}>{t('loading')}</p>}
       {list.error !== undefined && (
         <p className={css.errorLine} role="alert">
