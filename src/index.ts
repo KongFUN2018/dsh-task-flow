@@ -49,3 +49,9 @@ export { default as ReviewPolicyService } from './review-policy/index.ts'
 // attention, and review-policy domains.
 export * from './gate/index.ts'
 export { default as GateService } from './gate/index.ts'
+
+// Recipe-engine-core domain (folded from packages/task-flow/recipe-engine-core);
+// depends on task, recipe, and workbench-journal domains plus published
+// @deepseek-ai agent/goal/llm/session/storage-domain peers.
+export * from './recipe-engine-core/index.ts'
+export { default as RecipeEngineCore } from './recipe-engine-core/index.ts'

@@ -16,4 +16,6 @@ export * from './review-policy/index.ts';
 export { default as ReviewPolicyService } from './review-policy/index.ts';
 export * from './gate/index.ts';
 export { default as GateService } from './gate/index.ts';
+export * from './recipe-engine-core/index.ts';
+export { default as RecipeEngineCore } from './recipe-engine-core/index.ts';
 //# sourceMappingURL=index.d.ts.map
