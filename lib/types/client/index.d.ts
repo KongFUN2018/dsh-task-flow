@@ -4,34 +4,37 @@
  * the toolview create-confirm) into one `dsh.client` contribution mounted by
  * the DSH web shell through this package's `dsh.client` declaration.
  *
- * Beyond aggregation, this half owns its Remote ground-truth: the published
- * `@deepseek-ai/dsh-api-remotes` peer selects only the official Host
- * namespaces and does NOT mount the task-flow domains (`tasks`, `recipes`,
- * `workbenchHost`, `workbenchHostStream`, `deliverables`, `digest`, `metrics`,
- * `rewind` — they only exist in this package's fork lineage). So this plugin
- * `$mount`s the folded generated `remote/*` contributions itself, which
- * registers each namespace as an injectable `remote.<namespace>` client
- * service and makes `ctx.remote.<namespace>.<method>()` callable from the
- * features. It then registers each folded domain into its declared seat
- * (`sidebar.footer.action` trigger + `shell.overlay` drawer + the
- * `workbench.drawer.*` content seats + `tool.call.toolview`).
+ * Remote ground-truth: the published `@deepseek-ai/dsh-api-remotes` peer only
+ * mounts the official Host namespaces and never the task-flow domains
+ * (`tasks`, `recipes`, `workbenchHost`, `workbenchHostStream`, `deliverables`,
+ * `digest`, `metrics`, `rewind` — they exist only in this fork lineage). So
+ * this plugin `$mount`s the folded generated `remote/*` contributions itself.
+ *
+ * Cordis constraint this satisfies: a plugin cannot inject a service its own
+ * `apply` provides, and the feature domains read `ctx.remote.<namespace>` which
+ * Cordis's property guard requires to be declared in `inject`. Because the
+ * namespaces are provided here, each feature domain is therefore spawned as a
+ * child plugin carrying its own `inject` (including the `remote.<namespace>` it
+ * reads), and the mount runs first so those injects resolve before any feature
+ * activates.
  *
  * @module @kongfun2018/dsh-task-flow/client
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client';
+import type { Context } from '@deepseek-ai/cordis';
 /**
- * Required services across this assembly: the slot system, locale, and the
- * base `remote` carrier onto which this plugin mounts the task-flow
- * namespaces. The `remote.<namespace>` sub-services are created by `$mount`
- * inside `apply`, so they must not appear here — a plugin cannot await a
- * service its own `apply` provides.
+ * Required services this aggregate needs directly: the slot system, locale, and
+ * the base `remote` carrier onto which the namespaces are mounted. The
+ * `remote.<namespace>` sub-services are provided by the mount child plugin, so
+ * they are intentionally NOT here (a plugin cannot inject a service it
+ * provides) — the feature child plugins declare them.
  */
 export declare const inject: string[];
 /**
- * Mount the task-flow Host Remote contributions, then every client feature.
- * @param ctx - Client Cordis root carrying the typed API service.
- * @returns disposer reversing the mounts (feature registrations dispose with
- * the plugin fiber).
+ * Mount the task-flow Host Remote contributions, then activate every feature
+ * domain as a child plugin (each injects the `remote.<ns>` it reads).
+ * @param ctx - Client Cordis root carrying the typed API carrier.
+ * @returns disposer for the mount child plugin; feature child plugins dispose
+ * with this plugin's fiber.
  */
-export declare function apply(ctx: ClientContext): Promise<() => Promise<void>>;
+export declare function apply(ctx: Context): Promise<() => Promise<void>>;
 //# sourceMappingURL=index.d.ts.map

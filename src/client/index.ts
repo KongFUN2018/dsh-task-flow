@@ -4,20 +4,23 @@
  * the toolview create-confirm) into one `dsh.client` contribution mounted by
  * the DSH web shell through this package's `dsh.client` declaration.
  *
- * Beyond aggregation, this half owns its Remote ground-truth: the published
- * `@deepseek-ai/dsh-api-remotes` peer selects only the official Host
- * namespaces and does NOT mount the task-flow domains (`tasks`, `recipes`,
- * `workbenchHost`, `workbenchHostStream`, `deliverables`, `digest`, `metrics`,
- * `rewind` — they only exist in this package's fork lineage). So this plugin
- * `$mount`s the folded generated `remote/*` contributions itself, which
- * registers each namespace as an injectable `remote.<namespace>` client
- * service and makes `ctx.remote.<namespace>.<method>()` callable from the
- * features. It then registers each folded domain into its declared seat
- * (`sidebar.footer.action` trigger + `shell.overlay` drawer + the
- * `workbench.drawer.*` content seats + `tool.call.toolview`).
+ * Remote ground-truth: the published `@deepseek-ai/dsh-api-remotes` peer only
+ * mounts the official Host namespaces and never the task-flow domains
+ * (`tasks`, `recipes`, `workbenchHost`, `workbenchHostStream`, `deliverables`,
+ * `digest`, `metrics`, `rewind` — they exist only in this fork lineage). So
+ * this plugin `$mount`s the folded generated `remote/*` contributions itself.
+ *
+ * Cordis constraint this satisfies: a plugin cannot inject a service its own
+ * `apply` provides, and the feature domains read `ctx.remote.<namespace>` which
+ * Cordis's property guard requires to be declared in `inject`. Because the
+ * namespaces are provided here, each feature domain is therefore spawned as a
+ * child plugin carrying its own `inject` (including the `remote.<namespace>` it
+ * reads), and the mount runs first so those injects resolve before any feature
+ * activates.
  *
  * @module @kongfun2018/dsh-task-flow/client
  */
+import type { Context } from '@deepseek-ai/cordis'
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 // Type-only: replays the task-flow Host Remote namespace maps and the forwarded
 // `task/updated` / `workbench/attention-updated` event selection into this
@@ -42,42 +45,108 @@ import { apply as applyTaskDetail } from '../client-ui/task-detail/client/index.
 import { apply as applyTaskList } from '../client-ui/task-list/client/index.ts'
 
 /**
- * Required services across this assembly: the slot system, locale, and the
- * base `remote` carrier onto which this plugin mounts the task-flow
- * namespaces. The `remote.<namespace>` sub-services are created by `$mount`
- * inside `apply`, so they must not appear here — a plugin cannot await a
- * service its own `apply` provides.
+ * Required services this aggregate needs directly: the slot system, locale, and
+ * the base `remote` carrier onto which the namespaces are mounted. The
+ * `remote.<namespace>` sub-services are provided by the mount child plugin, so
+ * they are intentionally NOT here (a plugin cannot inject a service it
+ * provides) — the feature child plugins declare them.
  */
 export const inject = ['slots', 'locale', 'remote']
 
-/**
- * Mount the task-flow Host Remote contributions, then every client feature.
- * @param ctx - Client Cordis root carrying the typed API service.
- * @returns disposer reversing the mounts (feature registrations dispose with
- * the plugin fiber).
- */
-export async function apply(ctx: ClientContext): Promise<() => Promise<void>> {
-  const disposers: Array<() => Promise<void>> = []
-  try {
-    for (const contribution of taskFlowRemoteContributions) {
-      disposers.push(await ctx.remote.$mount(contribution))
+/** One folded feature domain wrapped as a child plugin with its real inject. */
+interface FeaturePlugin {
+  readonly id: string
+  readonly inject: readonly string[]
+  readonly apply: (ctx: ClientContext) => void
+}
+
+/** The nine feature domains, each with the `remote.*` declarations it reads. */
+const FEATURES: readonly FeaturePlugin[] = [
+  {
+    id: 'ui-workbench-drawer',
+    inject: ['slots', 'remote', 'remote.workbenchHost', 'remote.tasks', 'locale'],
+    apply: applyWorkbenchDrawer,
+  },
+  {
+    id: 'ui-attention-inbox',
+    inject: ['slots', 'remote', 'remote.workbenchHost', 'remote.workbenchHostStream', 'locale'],
+    apply: applyAttentionInbox,
+  },
+  {
+    id: 'ui-clarifications',
+    inject: ['slots', 'remote', 'remote.workbenchHost', 'locale'],
+    apply: applyClarifications,
+  },
+  {
+    id: 'ui-recipe-library',
+    inject: ['slots', 'remote', 'remote.recipes', 'locale'],
+    apply: applyRecipeLibrary,
+  },
+  {
+    id: 'ui-task-board',
+    inject: ['slots', 'remote', 'remote.tasks', 'remote.metrics', 'locale'],
+    apply: applyTaskBoard,
+  },
+  {
+    id: 'ui-task-create',
+    inject: ['slots', 'remote', 'remote.recipes', 'remote.tasks', 'locale'],
+    apply: applyTaskCreate,
+  },
+  {
+    id: 'ui-task-create-confirm',
+    inject: ['slots', 'remote', 'remote.tasks', 'locale'],
+    apply: applyTaskCreateConfirm,
+  },
+  {
+    id: 'ui-task-detail',
+    inject: ['slots', 'remote', 'remote.tasks', 'remote.digest', 'remote.rewind', 'remote.deliverables', 'locale'],
+    apply: applyTaskDetail,
+  },
+  {
+    id: 'ui-task-list',
+    inject: ['slots', 'remote', 'remote.tasks', 'locale'],
+    apply: applyTaskList,
+  },
+]
+
+/** The mount child plugin: mounts every task-flow namespace before features run. */
+const REMOTE_MOUNT_PLUGIN = {
+  name: 'dsh-task-flow-remotes',
+  inject: ['remote'],
+  async apply(ctx: ClientContext): Promise<() => Promise<void>> {
+    const disposers: Array<() => Promise<void>> = []
+    try {
+      for (const contribution of taskFlowRemoteContributions) {
+        disposers.push(await ctx.remote.$mount(contribution))
+      }
+    } catch (error) {
+      for (const dispose of disposers.reverse()) await dispose()
+      throw error
     }
-  } catch (error) {
-    for (const dispose of disposers.reverse()) await dispose()
-    throw error
+    return async () => {
+      for (const dispose of disposers.reverse()) await dispose()
+    }
+  },
+}
+
+/**
+ * Mount the task-flow Host Remote contributions, then activate every feature
+ * domain as a child plugin (each injects the `remote.<ns>` it reads).
+ * @param ctx - Client Cordis root carrying the typed API carrier.
+ * @returns disposer for the mount child plugin; feature child plugins dispose
+ * with this plugin's fiber.
+ */
+export async function apply(ctx: Context): Promise<() => Promise<void>> {
+  // The mount registers `remote.*` services on the shared ctx; awaiting it
+  // guarantees the namespace services exist before feature injects resolve.
+  const mount = await ctx.plugin(REMOTE_MOUNT_PLUGIN)
+  await mount.await()
+  for (const feature of FEATURES) {
+    await ctx.plugin({
+      name: feature.id,
+      inject: [...feature.inject],
+      apply: feature.apply,
+    }).await()
   }
-  // Feature registration happens after the namespaces are live, so every
-  // `ctx.remote.<namespace>` read inside a controller resolves.
-  applyWorkbenchDrawer(ctx)
-  applyAttentionInbox(ctx)
-  applyClarifications(ctx)
-  applyRecipeLibrary(ctx)
-  applyTaskBoard(ctx)
-  applyTaskCreate(ctx)
-  applyTaskCreateConfirm(ctx)
-  applyTaskDetail(ctx)
-  applyTaskList(ctx)
-  return async () => {
-    for (const dispose of disposers.reverse()) await dispose()
-  }
+  return async () => { /* feature fibers dispose with this plugin; nothing more */ }
 }
