@@ -60,6 +60,11 @@ const clientBundle: UserConfig = {
   sourcemap: true,
   clean: false,
   external: CLIENT_EXTERNALS,
+  // tsdown auto-externalizes package dependencies by default; anything NOT in
+  // the client loader's module table must inline instead (zod for the folded
+  // remote codec schemas, …) or the factory would issue a require("zod") the
+  // shell cannot answer. Mirrors the official CLIENT_EXTERNALS noExternal rule.
+  noExternal: (id) => (CLIENT_EXTERNALS.includes(id) ? undefined : true),
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
     'import.meta.env.MODE': JSON.stringify(process.env.NODE_ENV ?? 'production'),
