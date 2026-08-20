@@ -44,3 +44,8 @@ export {
 // depends on task + attention + workbench-journal.
 export * from './review-policy/index.ts'
 export { default as ReviewPolicyService } from './review-policy/index.ts'
+
+// Gate domain (folded from packages/task-flow/gate); depends on task, recipe,
+// attention, and review-policy domains.
+export * from './gate/index.ts'
+export { default as GateService } from './gate/index.ts'

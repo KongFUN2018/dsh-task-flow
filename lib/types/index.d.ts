@@ -14,4 +14,6 @@ export { default as AttentionService } from './attention/index.ts';
 export { ImpactSnapshotId, deliverableLocalDomainSpec, deliverableVersionSchema, phaseInputsSchema, DeliverableError, DeliverableService, } from './deliverable/index.ts';
 export * from './review-policy/index.ts';
 export { default as ReviewPolicyService } from './review-policy/index.ts';
+export * from './gate/index.ts';
+export { default as GateService } from './gate/index.ts';
 //# sourceMappingURL=index.d.ts.map
