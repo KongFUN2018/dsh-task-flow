@@ -26,4 +26,6 @@ export * from './rewind/index.ts';
 export { default as RewindService } from './rewind/index.ts';
 export * from './budget/index.ts';
 export { default as BudgetService } from './budget/index.ts';
+export * from './digest/index.ts';
+export { default as DigestService } from './digest/index.ts';
 //# sourceMappingURL=index.d.ts.map

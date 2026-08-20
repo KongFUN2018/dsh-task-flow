@@ -78,3 +78,9 @@ export { default as RewindService } from './rewind/index.ts'
 // @deepseek-ai storage-domain/typert-protocol/brand peers.
 export * from './budget/index.ts'
 export { default as BudgetService } from './budget/index.ts'
+
+// Digest domain (folded from packages/task-flow/digest); depends on task,
+// deliverable, and workbench-journal domains plus published
+// @deepseek-ai typert-protocol peers.
+export * from './digest/index.ts'
+export { default as DigestService } from './digest/index.ts'

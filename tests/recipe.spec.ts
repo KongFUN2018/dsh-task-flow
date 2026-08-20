@@ -10,9 +10,9 @@ import RecipeRegistry, {
   hashRecipePayload,
   validateRecipePayload,
   verifyRecipeHash,
-} from '@deepseek-ai/dsh-recipe/src/index.ts'
-import { RecipeError } from '@deepseek-ai/dsh-recipe/src/types.ts'
-import type { RecipePayload, RecipePhaseSpec, RecipeRevision } from '@deepseek-ai/dsh-recipe/src/types.ts'
+} from '../src/recipe/index.ts'
+import { RecipeError } from '../src/recipe/types.ts'
+import type { RecipePayload, RecipePhaseSpec, RecipeRevision } from '../src/recipe/types.ts'
 import { FROZEN_RECIPE } from './fixtures/frozen-recipe.ts'
 
 const valid = (over: Partial<RecipePayload> = {}): RecipePayload => ({
