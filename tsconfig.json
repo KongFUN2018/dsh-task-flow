@@ -12,6 +12,8 @@
     "jsx": "react-jsx",
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,

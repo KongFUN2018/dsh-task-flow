@@ -33,4 +33,6 @@ export * from './metrics/index.ts';
 export { default as MetricsService } from './metrics/index.ts';
 export * from './impact/index.ts';
 export { default as ImpactPropagationService } from './impact/index.ts';
+export * from './edit-lock/index.ts';
+export { default as EditLockService } from './edit-lock/index.ts';
 //# sourceMappingURL=index.d.ts.map

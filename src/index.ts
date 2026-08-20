@@ -120,3 +120,9 @@ export { default as MetricsService } from './metrics/index.ts'
 // published @deepseek-ai typert-protocol peers.
 export * from './impact/index.ts'
 export { default as ImpactPropagationService } from './impact/index.ts'
+
+// Edit-lock domain (folded from packages/task-flow/edit-lock); depends on task,
+// deliverable, and workbench-journal domains plus published
+// @deepseek-ai storage-domain/typert-protocol/brand peers.
+export * from './edit-lock/index.ts'
+export { default as EditLockService } from './edit-lock/index.ts'

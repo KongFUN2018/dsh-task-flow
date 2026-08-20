@@ -1,0 +1,1 @@
+{"version":3,"file":"runtime.d.ts","sourceRoot":"","sources":["../../../src/edit-lock/runtime.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAGH,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,kBAAkB,CAAA;AAC9C,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,YAAY,CAAA;AAE7C;;;;GAIG;AACH,wBAAgB,WAAW,CAAC,KAAK,EAAE,MAAM,GAAG,WAAW,CAEtD;AAED;;;;GAIG;AACH,eAAO,MAAM,0BAA0B,EAAE,MAA8B,CAAA"}
