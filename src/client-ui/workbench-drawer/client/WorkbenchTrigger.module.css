@@ -1,0 +1,82 @@
+/* Sidebar "任务流程" primary entry. Intentionally more prominent than the
+   workspace browsing rows (filled emphasis block) and visually distinct from
+   the settings gear (accent fill + branch icon + bold label), so it reads as
+   the sidebar's primary action without being an overlay pill. Token-only. */
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-state-business-primary);
+  border-radius: 10px;
+  background: var(--dsw-alias-state-business-tertiary);
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.trigger:hover {
+  background: var(--dsw-alias-state-business-tertiary);
+  filter: brightness(0.97);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.icon {
+  flex: none;
+  color: var(--dsw-alias-state-business-primary);
+}
+
+.label {
+  max-width: 180px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Rail (collapsed): a single safe-area icon centered like the other rail
+   controls, with a small live dot when tasks are running. */
+.rail {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+}
+
+.rail:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.rail:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.railDot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-success-primary);
+}

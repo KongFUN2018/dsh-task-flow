@@ -1,0 +1,206 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.rowDot {
+  flex: none;
+}
+
+.section {
+  margin: 6px 0 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.row:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.itemId {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--dsw-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+}
+
+.meta {
+  flex: none;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.statusLine,
+.errorLine {
+  margin: 0;
+  padding: 4px 2px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.statusLine {
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.errorLine {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+/* Run branch line + phase timeline + gate groups + patch/rewind verbs. */
+.runLine {
+  margin: 4px 0 8px;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--dsw-alias-border-l2);
+}
+
+.archivedPhase {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+.gateGroup {
+  margin-bottom: 8px;
+}
+
+.gateClass {
+  margin: 6px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.verbRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+
+.rewindPanel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--dsw-alias-interactive-bg-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.rootList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.rootsHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.rootRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+/* Product-revision patch form: note, submit/cancel, and error line. */
+.patchPanel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--dsw-alias-interactive-bg-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.patchNote {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  font: inherit;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.patchActions {
+  display: flex;
+  gap: 6px;
+}
+
+.successLine {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dsw-alias-state-success-primary);
+}
+
+.hintLine {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}

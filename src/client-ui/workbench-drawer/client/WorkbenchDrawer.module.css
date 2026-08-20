@@ -1,0 +1,203 @@
+/* Floating trigger + right-side drawer shell. Semantic --dsw-alias-* tokens
+   only; light/dark ride the theme's token flips. */
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 999px;
+  background: var(--dsw-alias-button-floating-fill);
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 6px 24px var(--dsw-alias-bg-mask-drop);
+  transition: background 0.16s, transform 0.16s;
+}
+
+.trigger:hover {
+  background: var(--dsw-alias-button-floating-hover);
+  transform: translateY(-1px);
+}
+
+.trigger:focus-visible,
+.close:focus-visible,
+.tabs button:focus-visible,
+.resize:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.triggerLabel {
+  white-space: nowrap;
+}
+
+.dotIdle,
+.dotActive {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.dotIdle {
+  background: var(--dsw-alias-border-l3);
+}
+
+.dotActive {
+  background: var(--dsw-alias-state-success-primary);
+  animation: badgePulse 2s infinite;
+}
+
+.badge {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--dsw-alias-state-error-primary);
+  color: var(--dsw-alias-label-primary-foreground);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-weight: 600;
+}
+
+@keyframes badgePulse {
+  0% { box-shadow: 0 0 0 0 var(--dsw-alias-state-success-primary); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--dsw-alias-bg-layer-1);
+  border-left: 1px solid var(--dsw-alias-border-l2);
+  box-shadow: -16px 0 48px var(--dsw-alias-bg-mask-drop);
+  max-width: 94vw;
+}
+
+.resize {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.resize:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.headTitle {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.close {
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 7px;
+}
+
+.close:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.tabs button {
+  position: relative;
+  background: none;
+  border: 0;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 8px 8px 0 0;
+  transition: color 0.16s, background 0.16s;
+}
+
+.tabOff {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.tabOff:hover {
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.tabOn {
+  color: var(--dsw-alias-label-primary);
+  font-weight: 600;
+}
+
+.tabOn::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--dsw-alias-state-business-primary);
+}
+
+.tabCount,
+.tabCountHot {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.tabCount {
+  background: var(--dsw-alias-bg-layer-3);
+  color: var(--dsw-alias-label-secondary);
+}
+
+.tabCountHot {
+  background: var(--dsw-alias-state-error-primary);
+  color: var(--dsw-alias-label-primary-foreground);
+  font-weight: 600;
+}
+
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 18px;
+  --dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2);
+  --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2);
+}
