@@ -108,3 +108,9 @@ export {
   InvalidateItemResponse,
   WorkbenchAttentionUpdate,
 } from './workbench/host/index.ts'
+
+// Metrics domain (folded from packages/task-flow/metrics); depends on task,
+// workbench-host, workbench-journal, and deliverable domains plus published
+// @deepseek-ai typert-protocol peers.
+export * from './metrics/index.ts'
+export { default as MetricsService } from './metrics/index.ts'

@@ -5,7 +5,7 @@
  * structure; it is not the shipped default.
  */
 
-import type { RecipePayload } from '../../src/types.ts'
+import type { RecipePayload } from '../../src/recipe/types.ts'
 
 export const FROZEN_RECIPE: RecipePayload = {
   phases: [
