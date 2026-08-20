@@ -114,3 +114,9 @@ export {
 // @deepseek-ai typert-protocol peers.
 export * from './metrics/index.ts'
 export { default as MetricsService } from './metrics/index.ts'
+
+// Impact-propagation domain (folded from packages/task-flow/impact-propagation,
+// folded as src/impact); depends on task and deliverable domains plus
+// published @deepseek-ai typert-protocol peers.
+export * from './impact/index.ts'
+export { default as ImpactPropagationService } from './impact/index.ts'

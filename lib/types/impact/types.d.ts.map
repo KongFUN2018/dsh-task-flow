@@ -1,0 +1,1 @@
+{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../../../src/impact/types.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,OAAO,KAAK,EAAE,eAAe,EAAE,cAAc,EAAE,MAAM,kBAAkB,CAAA;AAEvE,mDAAmD;AACnD,MAAM,WAAW,iBAAiB;IAChC,sFAAsF;IACtF,QAAQ,CAAC,eAAe,EAAE,SAAS,cAAc,EAAE,CAAA;IACnD,qFAAqF;IACrF,QAAQ,CAAC,gBAAgB,EAAE,SAAS,eAAe,EAAE,CAAA;CACtD"}

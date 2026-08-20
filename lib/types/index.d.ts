@@ -31,4 +31,6 @@ export { default as DigestService } from './digest/index.ts';
 export { WorkbenchItemId, WorkbenchHostService, AttentionItemStatus, AttentionItemView, WorkbenchSnapshot, BatchConfirmItem, BatchConfirmOutcome, BatchConfirmItemResult, BatchConfirmRequest, BatchConfirmResponse, ResolveDecisionRequest, ResolveDecisionResponse, InvalidateItemRequest, InvalidateItemResponse, WorkbenchAttentionUpdate, } from './workbench/host/index.ts';
 export * from './metrics/index.ts';
 export { default as MetricsService } from './metrics/index.ts';
+export * from './impact/index.ts';
+export { default as ImpactPropagationService } from './impact/index.ts';
 //# sourceMappingURL=index.d.ts.map
