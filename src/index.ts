@@ -84,3 +84,27 @@ export { default as BudgetService } from './budget/index.ts'
 // @deepseek-ai typert-protocol peers.
 export * from './digest/index.ts'
 export { default as DigestService } from './digest/index.ts'
+
+// Workbench host domain (folded from packages/task-flow/workbench-host);
+// depends on attention and workbench-journal domains plus published
+// @deepseek-ai typert-protocol/brand peers. The types AttentionItemKind,
+// DecisionOutcome, and InvalidateOutcome already exist on the attention domain
+// (folded earlier and the canonical owner), so they are intentionally not
+// re-exported from workbench-host to avoid the aggregate name collision.
+export {
+  WorkbenchItemId,
+  WorkbenchHostService,
+  AttentionItemStatus,
+  AttentionItemView,
+  WorkbenchSnapshot,
+  BatchConfirmItem,
+  BatchConfirmOutcome,
+  BatchConfirmItemResult,
+  BatchConfirmRequest,
+  BatchConfirmResponse,
+  ResolveDecisionRequest,
+  ResolveDecisionResponse,
+  InvalidateItemRequest,
+  InvalidateItemResponse,
+  WorkbenchAttentionUpdate,
+} from './workbench/host/index.ts'
