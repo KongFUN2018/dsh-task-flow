@@ -9,4 +9,7 @@ export * from './task/index.ts';
 export { default as TaskHandle } from './task/index.ts';
 export * from './workbench/journal/index.ts';
 export { default as WorkbenchJournalService } from './workbench/journal/index.ts';
+export * from './attention/index.ts';
+export { default as AttentionService } from './attention/index.ts';
+export { ImpactSnapshotId, deliverableLocalDomainSpec, deliverableVersionSchema, phaseInputsSchema, DeliverableError, DeliverableService, } from './deliverable/index.ts';
 //# sourceMappingURL=index.d.ts.map

@@ -20,3 +20,22 @@ export { default as TaskHandle } from './task/index.ts'
 // base of the workbench group; depends only on the folded task domain.
 export * from './workbench/journal/index.ts'
 export { default as WorkbenchJournalService } from './workbench/journal/index.ts'
+
+// Attention domain (folded from packages/task-flow/attention); depends on the
+// folded task + workbench-journal domains.
+export * from './attention/index.ts'
+export { default as AttentionService } from './attention/index.ts'
+
+// Deliverable domain (folded from packages/task-flow/deliverable-local);
+// depends on task + workbench-journal. The branded DeliverableId /
+// DeliverableVersionId constructors are already exported by the task domain
+// (identical branded types), so they are intentionally not re-exported from
+// deliverable — that avoids the aggregate name collision.
+export {
+  ImpactSnapshotId,
+  deliverableLocalDomainSpec,
+  deliverableVersionSchema,
+  phaseInputsSchema,
+  DeliverableError,
+  DeliverableService,
+} from './deliverable/index.ts'
