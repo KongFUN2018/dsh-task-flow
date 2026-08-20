@@ -38,4 +38,6 @@ export { default as EditLockService } from './edit-lock/index.ts';
 export * from './task-local/index.ts';
 export { default as LocalTaskService } from './task-local/index.ts';
 export * from './tool-task-create/index.ts';
+export * from './workbench/host-stream/index.ts';
+export { default as WorkbenchHostStreamService } from './workbench/host-stream/index.ts';
 //# sourceMappingURL=index.d.ts.map

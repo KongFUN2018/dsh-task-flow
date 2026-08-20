@@ -137,3 +137,9 @@ export { default as LocalTaskService } from './task-local/index.ts'
 // plugin `apply` registration, depends on the recipe domain plus published
 // @deepseek-ai tools peer.
 export * from './tool-task-create/index.ts'
+
+// Workbench host-stream domain (folded from packages/task-flow/workbench-host-stream);
+// depends on the workbench-journal domain plus published
+// @deepseek-ai typert-protocol peers.
+export * from './workbench/host-stream/index.ts'
+export { default as WorkbenchHostStreamService } from './workbench/host-stream/index.ts'

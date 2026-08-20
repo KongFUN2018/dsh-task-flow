@@ -1,0 +1,1 @@
+{"version":3,"file":"invariant.d.ts","sourceRoot":"","sources":["../../../../src/workbench/host-stream/invariant.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAGH,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAA;AAIlD,oCAAoC;AACpC,eAAO,MAAM,IAAI,oCAAoC,CAAA;AACrD,iEAAiE;AACjE,eAAO,MAAM,MAAM,UAAiB,CAAA;AAOpC;;;;GAIG;AACH,eAAO,MAAM,KAAK,GAAI,KAAK,OAAO,KAAG,OAAO,CAAC,MAAM,IAAI,CAAoE,CAAA"}
