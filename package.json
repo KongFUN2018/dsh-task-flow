@@ -26,12 +26,46 @@
       "types": "./lib/types/types.d.ts",
       "default": "./lib/types/types.js"
     },
+    "./remote/recipe": {
+      "types": "./remote/recipe.d.ts",
+      "default": "./remote/recipe.js"
+    },
+    "./remote/task": {
+      "types": "./remote/task.d.ts",
+      "default": "./remote/task.js"
+    },
+    "./remote/deliverables": {
+      "types": "./remote/deliverables.d.ts",
+      "default": "./remote/deliverables.js"
+    },
+    "./remote/digest": {
+      "types": "./remote/digest.d.ts",
+      "default": "./remote/digest.js"
+    },
+    "./remote/metrics": {
+      "types": "./remote/metrics.d.ts",
+      "default": "./remote/metrics.js"
+    },
+    "./remote/rewind": {
+      "types": "./remote/rewind.d.ts",
+      "default": "./remote/rewind.js"
+    },
+    "./remote/workbench": {
+      "types": "./remote/workbench.d.ts",
+      "default": "./remote/workbench.js"
+    },
+    "./remote/workbenchHostStream": {
+      "types": "./remote/workbenchHostStream.d.ts",
+      "default": "./remote/workbenchHostStream.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
     "lib/index.js",
     "lib/invariant.js",
-    "lib/**/*.d.ts"
+    "lib/**/*.d.ts",
+    "remote/**/*.js",
+    "remote/**/*.d.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && tsdown",
