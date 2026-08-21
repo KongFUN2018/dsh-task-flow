@@ -112,6 +112,21 @@
   color: var(--dsw-alias-label-primary);
 }
 
+.recipesButton {
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-surface-l1);
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.recipesButton:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+  border-color: var(--dsw-alias-border-l3);
+}
+
 .close {
   border: 0;
   background: transparent;

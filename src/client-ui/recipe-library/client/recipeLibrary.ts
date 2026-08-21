@@ -9,7 +9,8 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 // Type-only: pulls the generated recipes Remote namespace into this compilation program.
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
-import type { RecipeRevision } from '../../../recipe/types.ts'
+import type { RemoteResult } from '@deepseek-ai/dsh-typert-protocol'
+import type { RecipePayload, RecipeRevision } from '../../../recipe/types.ts'
 
 /** Lifecycle of the recipe-catalogue load. */
 export type RecipeLibraryStatus = 'loading' | 'ready' | 'failed'
@@ -117,4 +118,40 @@ export class RecipeLibraryController {
     }
     this.store.set({ status: 'ready', cards: result.value.map(cardOf), error: undefined, updatedAt: Date.now() })
   }
+
+  /**
+   * Create a new recipe family and refresh the catalogue.
+   * @param recipeId - the family id.
+   * @param payload - the revision-1 payload.
+   * @returns whether the create settled successfully.
+   */
+  async createRecipe(recipeId: string, payload: RecipePayload): Promise<RemoteResult<RecipeRevision>> {
+    const result = await this.ctx.remote.recipes.createRecipe(recipeId.trim(), payload)
+    if (result.ok) await this.refresh()
+    return result
+  }
+
+  /**
+   * Update one recipe family (new immutable revision) and refresh.
+   * @param recipeId - the family id.
+   * @param payload - the replacement payload.
+   * @returns whether the update settled successfully.
+   */
+  async updateRecipe(recipeId: string, payload: RecipePayload): Promise<RemoteResult<RecipeRevision>> {
+    const result = await this.ctx.remote.recipes.updateRecipe(recipeId.trim(), payload)
+    if (result.ok) await this.refresh()
+    return result
+  }
+
+  /**
+   * Soft-delete one recipe family and refresh.
+   * @param recipeId - the family id.
+   * @returns whether the delete settled successfully.
+   */
+  async deleteRecipe(recipeId: string): Promise<RemoteResult<boolean>> {
+    const result = await this.ctx.remote.recipes.deleteRecipe(recipeId.trim())
+    if (result.ok) await this.refresh()
+    return result
+  }
 }
+

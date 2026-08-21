@@ -94,3 +94,68 @@
   justify-content: flex-end;
   padding-top: 2px;
 }
+
+/* Destructive delete action: outline button tinted with the error token. */
+.deleteAction {
+  color: var(--dsw-alias-state-error-primary) !important;
+  border-color: var(--dsw-alias-state-error-primary) !important;
+}
+
+/* Modal content region scrolls independently of the fixed card frame. */
+.gridRegion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalFoot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Editor dialog. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.payloadEditor {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  padding: 8px 10px;
+  font-family: var(--dsw-alias-font-mono, ui-monospace, 'Cascadia Code', Consolas, monospace);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-surface-l1);
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  outline: none;
+}
+
+.payloadEditor:focus {
+  border-color: var(--dsw-alias-border-l3);
+}
+
+.formFoot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

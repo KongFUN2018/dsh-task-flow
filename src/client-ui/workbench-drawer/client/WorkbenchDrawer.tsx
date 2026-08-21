@@ -77,6 +77,7 @@ export function WorkbenchDrawer(props: WorkbenchDrawerProps) {
   const tab = useStore(s => s.tab)
   const detailTaskId = useStore(s => s.detailTaskId)
   const createRecipeId = useStore(s => s.createRecipeId)
+  const recipesOpen = useStore(s => s.recipesOpen)
 
   const selectTab = (next: DrawerTab) => {
     actions.selectTab(next)
@@ -148,12 +149,20 @@ export function WorkbenchDrawer(props: WorkbenchDrawerProps) {
       />
       <div className={css.head}>
         <span className={css.headTitle}>{t('trigger')}</span>
+        <button
+          type="button"
+          className={css.recipesButton}
+          onClick={() => { actions.openRecipes() }}
+          title={t('tab.recipeLibrary')}
+        >
+          {t('tab.recipeLibrary')}
+        </button>
         <button type="button" className={css.close} onClick={() => { actions.closeDrawer() }}>
           {t('close')}
         </button>
       </div>
       <div className={css.tabs} role="tablist">
-        {(['tasks', 'taskList', 'recipeLibrary', 'inbox', 'clarifications'] as const).map(key => (
+        {(['tasks', 'taskList', 'inbox', 'clarifications'] as const).map(key => (
           <button
             key={key}
             type="button"
@@ -177,12 +186,12 @@ export function WorkbenchDrawer(props: WorkbenchDrawerProps) {
       <div className={css.body}>
         {tab === 'tasks' && renderSlot('workbench.drawer.tasks', owner)}
         {tab === 'taskList' && renderSlot('workbench.drawer.taskList', owner)}
-        {tab === 'recipeLibrary' && renderSlot('workbench.drawer.recipeLibrary', owner)}
         {tab === 'inbox' && renderSlot('workbench.drawer.inbox', {})}
         {tab === 'clarifications' && renderSlot('workbench.drawer.clarifications', {})}
         {tab === 'detail' && renderSlot('workbench.drawer.detail', { taskId: detailTaskId, openInbox: owner.openInbox })}
         {tab === 'create' && renderSlot('workbench.drawer.create', owner)}
       </div>
+      {renderSlot('workbench.drawer.recipeLibrary', { open: recipesOpen, onClose: () => { actions.closeRecipes() } }) }
     </div>
   )
 }

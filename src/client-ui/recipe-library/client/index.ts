@@ -12,6 +12,7 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type { RecipePayload } from '../../../recipe/types.ts'
 import { RecipeLibraryController } from './recipeLibrary.ts'
 import { RecipeLibraryAction } from './RecipeLibraryAction.tsx'
 import { en, NS, zh, type RecipeLibraryKey } from './locales.ts'
@@ -39,6 +40,9 @@ export function apply(ctx: ClientContext): void {
     inject: () => ({
       hooks: { library: controller.store },
       refresh: () => controller.refresh(),
+      createRecipe: (recipeId: string, payload: RecipePayload) => controller.createRecipe(recipeId, payload),
+      updateRecipe: (recipeId: string, payload: RecipePayload) => controller.updateRecipe(recipeId, payload),
+      deleteRecipe: (recipeId: string) => controller.deleteRecipe(recipeId),
     }),
   }, RecipeLibraryAction))
 }

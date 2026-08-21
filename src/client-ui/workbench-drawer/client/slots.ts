@@ -32,11 +32,12 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      */
     'workbench.drawer.taskList': { kind: 'single'; scope: 'root'; owner: DrawerTasksOwnerProps }
     /**
-     * The Recipe-library tab body of the workbench drawer. Declared by the
-     * drawer shell's `shell.overlay` entry; renders processing-template cards
-     * and routes selection into the wizard (线稿「Recipe 库」).
+     * The standalone Recipe-library management modal, triggered from the
+     * drawer shell header. Declared by the drawer shell's `shell.overlay`
+     * entry; renders the recipe-card grid with create/edit/delete affordances
+     * in its own modal (线稿「Recipe 库」).
      */
-    'workbench.drawer.recipeLibrary': { kind: 'single'; scope: 'root'; owner: DrawerTasksOwnerProps }
+    'workbench.drawer.recipeLibrary': { kind: 'single'; scope: 'root'; owner: DrawerRecipeModalProps }
     /**
      * The clarification-queue tab body of the workbench drawer. Declared by the
      * drawer shell's `shell.overlay` entry; a focused view of open clarification
@@ -62,6 +63,14 @@ export interface DrawerTasksOwnerProps {
   openCreate: (recipeId?: string) => void
   /** The recipe the create wizard should pre-select, or undefined for a free pick. */
   initialRecipeId: string | undefined
+}
+
+/** Owner share of the Recipe-library modal seat: whether it shows and how to close it. */
+export interface DrawerRecipeModalProps {
+  /** Whether the standalone Recipe management modal is showing. */
+  open: boolean
+  /** Dismiss the modal (the drawer stay open behind it). */
+  onClose: () => void
 }
 
 /** Owner share of the detail seat: the task whose projection to show. */
