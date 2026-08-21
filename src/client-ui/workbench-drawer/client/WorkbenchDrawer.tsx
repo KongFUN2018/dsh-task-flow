@@ -11,11 +11,8 @@ import type { DrawerTasksOwnerProps } from './slots.ts'
 import type { createWorkbenchStore, DrawerTab } from './store.ts'
 import css from './WorkbenchDrawer.module.css'
 
-/** Conversation-relative drawer width: ~92% of the shell's center column. */
-const CONVERSATION_WIDTH_RATIO = 0.92
-
-/** Shell default geometry the center column derives from (sidebar | details). */
-const CENTER_OFFSET_X = 280 + 360
+/** Default drawer width as a share of the viewport width (~2/3). */
+const DRAWER_WIDTH_RATIO = 2 / 3
 
 /** Lower and upper width bounds for the user-resized drawer (px). */
 const WIDTH_MIN = 360
@@ -25,16 +22,15 @@ const WIDTH_MAX = 1320
 const VIEWPORT_SHARE = 0.94
 
 /**
- * Conversation-relative drawer width for the current viewport: the shell's
- * center column (viewport minus the default sidebar/details offset) scaled
- * by CONVERSATION_WIDTH_RATIO, capped to the draggable maximum. All tabs
- * share one default; a user drag overrides it within WIDTH_MIN..WIDTH_MAX.
+ * Default drawer width for the current viewport: ~2/3 of the window width,
+ * capped to the draggable maximum. A wide shell still stays under the 94vw
+ * clamp. All tabs share one default; a user drag overrides it within
+ * WIDTH_MIN..WIDTH_MAX.
  * @param viewport - current window.innerWidth.
  * @returns the default drawer width in px, capped to both bounds.
  */
 export function defaultWidthFor(viewport: number): number {
-  const center = Math.max(0, viewport - CENTER_OFFSET_X)
-  return Math.round(Math.min(center * CONVERSATION_WIDTH_RATIO, WIDTH_MAX))
+  return Math.round(Math.min(viewport * DRAWER_WIDTH_RATIO, WIDTH_MAX))
 }
 
 /**
