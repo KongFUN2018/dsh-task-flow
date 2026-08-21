@@ -1,12 +1,13 @@
 /**
  * Task-creation object layer: a React-free controller that loads the recipe
- * catalogue through the recipes Remote, then creates a task through the
- * tasks Remote with a fresh idempotency key. The component reads only the
- * store snapshot and the command callback.
+ * catalogue through the recipes Remote and the real harness workspaces through
+ * the client `workspaces` service, then creates a task through the tasks
+ * Remote with a fresh idempotency key. The component reads only the store
+ * snapshot and the command callback.
  */
 
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
-import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import { createSnapshotStore, type ObservableSnapshot, type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type { RecipeRevision } from '../../../recipe/types.ts'
 import type { TaskMutationContext } from '../../../task/types.ts'
@@ -14,10 +15,20 @@ import type { TaskMutationContext } from '../../../task/types.ts'
 /** Lifecycle of the recipe-catalogue load. */
 export type CreateStatus = 'loading' | 'ready' | 'failed'
 
+/** One selectable task target workspace (a real harness workspace). */
+export interface WorkspaceOption {
+  /** Durable harness workspace id (UUID). */
+  readonly workspaceId: string
+  /** Display title (`Workspace.title`). */
+  readonly title: string
+}
+
 /** Snapshot state the create panel renders. */
 export interface CreateState {
   readonly status: CreateStatus
   readonly recipes: readonly RecipeRevision[]
+  /** Real harness workspaces in registry order (the "关联 Workspace" options). */
+  readonly workspaces: readonly WorkspaceOption[]
   readonly error?: string | undefined
 }
 
@@ -37,11 +48,32 @@ export class TaskCreateController {
   readonly store: SnapshotStore<CreateState>
 
   private readonly ctx: ClientContext
+  /** The live workspace list feed, mirrored into the store on change. */
+  private readonly workspaceList: ObservableSnapshot<{ items: readonly { workspaceId: unknown; title: string }[] }>
 
   constructor(ctx: ClientContext) {
     this.ctx = ctx
-    this.store = createSnapshotStore<CreateState>({ status: 'loading', recipes: [] })
+    this.store = createSnapshotStore<CreateState>({ status: 'loading', recipes: [], workspaces: [] })
+    // Client-runtime provides the real harness workspaces service (`ctx.workspaces.list`).
+    this.workspaceList = ctx.workspaces.list
     void this.refresh()
+    // Mirror now (baseline may already be ready) and on every feed change,
+    // so the candidates reflect workspaces that appear after this pane loads.
+    this.mirrorWorkspaces()
+    this.unsubscribeWorkspaces = this.workspaceList.subscribe(() => this.mirrorWorkspaces())
+  }
+
+  /** Tear down the workspace-feed mirror subscription. Called by the mount effect. */
+  readonly unsubscribeWorkspaces: () => void
+
+  /** Mirror the live workspace feed into `state.workspaces` (registry order). */
+  private mirrorWorkspaces(): void {
+    const items = this.workspaceList.getSnapshot().items
+    const workspaces: WorkspaceOption[] = items.map(item => ({
+      workspaceId: String(item.workspaceId),
+      title: item.title,
+    }))
+    this.store.set({ ...this.store.getSnapshot(), workspaces })
   }
 
   /** Reload the recipe catalogue from the recipes Remote. */
@@ -49,11 +81,16 @@ export class TaskCreateController {
     const result = await this.ctx.remote.recipes.listDetails()
     if (!result.ok) {
       this.store.set({
-        status: 'failed', recipes: [], error: result.error.code,
+        status: 'failed', recipes: [], workspaces: this.store.getSnapshot().workspaces, error: result.error.code,
       })
       return
     }
-    this.store.set({ status: 'ready', recipes: result.value, error: undefined })
+    this.store.set({
+      status: 'ready',
+      recipes: result.value,
+      workspaces: this.store.getSnapshot().workspaces,
+      error: undefined,
+    })
   }
 
   /**
@@ -70,7 +107,7 @@ export class TaskCreateController {
   /**
    * Create one task from the chosen recipe.
    * @param recipeId - the chosen recipe id, already in the catalogue.
-   * @param workspaceId - the owning workspace.
+   * @param workspaceId - the owning workspace (harness workspace id, or a free fallback).
    * @param actor - the creating actor.
    * @param goal - goal text; carried by the caller, not persisted here.
    * @returns the created task id.

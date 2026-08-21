@@ -9,6 +9,7 @@ import css from './TaskCreateAction.module.css'
 export interface TaskCreateActionInjected {
   hooks: {
     create: HostObservable<CreateState>
+    createWorkspaces: HostObservable<CreateState>
   }
   refresh: () => void
   create: (recipeId: string, workspaceId: string, goal: string) => Promise<string>
@@ -51,12 +52,12 @@ function kindLabel(t: (key: string, params?: Record<string, string>) => string, 
  * follow-up iteration; the current model is a serial phase pipeline.
  */
 export function TaskCreateAction(props: TaskCreateActionProps) {
-  const { t, openDetail, initialRecipeId, useCreate, useWorkspaces, create, polish } = props
+  const { t, openDetail, initialRecipeId, useCreate, useCreateWorkspaces, create, polish } = props
   const tr = t as (key: string, params?: Record<string, string>) => string
   const state = useCreate(state => state)
-  // Real harness workspaces (standard feed; independent baseline lifecycle).
-  const workspacesHost = useWorkspaces(snapshot => snapshot)
-  const workspaceItems = workspacesHost.items
+  // Real harness workspace candidates (mirrored from the client `workspaces`
+  // service by the create controller into `state.workspaces`).
+  const workspaceItems = useCreateWorkspaces(state => state.workspaces)
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
   const [workspace, setWorkspace] = useState('default')
   const [goal, setGoal] = useState('')
