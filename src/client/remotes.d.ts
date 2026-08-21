@@ -71,11 +71,14 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
       startTask: (taskId: string, mutation: TaskMutationContext) => Promise<RemoteResult<TaskRecord>>
     }
     'recipes': {
+      createRecipe: (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+      deleteRecipe: (recipeId: string) => Promise<RemoteResult<boolean>>
       getPinned: (identity: RecipeIdentity) => Promise<RemoteResult<RecipeRevision>>
       latest: (recipeId: string) => Promise<RemoteResult<RecipeRevision | undefined>>
       list: () => Promise<RemoteResult<RecipeIdentity[]>>
       listDetails: () => Promise<RemoteResult<RecipeRevision[]>>
       register: (recipeId: string, revision: number, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+      updateRecipe: (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
     }
     'metrics': {
       metrics: () => Promise<RemoteResult<WorkbenchMetrics>>

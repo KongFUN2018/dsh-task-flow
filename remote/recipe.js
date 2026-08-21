@@ -206,9 +206,71 @@ const _deepseek_ai_dsh_recipe_recipes_register_result$schema = z.object({
   'registeredAt': z.number().readonly(),
 })
 
+const _deepseek_ai_dsh_recipe_recipes_deleteRecipe_result$schema = z.boolean()
+
 export const TYPERT_REMOTE = {
   package: '@deepseek-ai/dsh-recipe',
   descriptors: [
+    {
+      id: '@deepseek-ai/dsh-recipe#recipes/createRecipe',
+      service: 'recipes',
+      namespace: 'recipes',
+      method: 'createRecipe',
+      invocation: { kind: 'direct' },
+      parameters: [
+        {
+          name: 'recipeId',
+          wire: 'recipeId',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@deepseek-ai/dsh-recipe#recipes/createRecipe:recipeId',
+            schema: _deepseek_ai_dsh_recipe_recipes_register_parameter_0$schema,
+          },
+        },
+        {
+          name: 'payload',
+          wire: 'payload',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@deepseek-ai/dsh-recipe/types#RecipePayload',
+            schema: _deepseek_ai_dsh_recipe_recipes_register_parameter_2$schema,
+          },
+        },
+      ],
+      result: {
+        mode: 'strict',
+        typeSymbol: '@deepseek-ai/dsh-recipe/types#RecipeRevision',
+        schema: _deepseek_ai_dsh_recipe_recipes_register_result$schema,
+      },
+      sourceLocation: {"file":"packages/task-flow/recipe/src/index.ts","line":300,"column":3},
+    },
+    {
+      id: '@deepseek-ai/dsh-recipe#recipes/deleteRecipe',
+      service: 'recipes',
+      namespace: 'recipes',
+      method: 'deleteRecipe',
+      invocation: { kind: 'direct' },
+      parameters: [
+        {
+          name: 'recipeId',
+          wire: 'recipeId',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@deepseek-ai/dsh-recipe#recipes/deleteRecipe:recipeId',
+            schema: _deepseek_ai_dsh_recipe_recipes_register_parameter_0$schema,
+          },
+        },
+      ],
+      result: {
+        mode: 'strict',
+        typeSymbol: '@deepseek-ai/dsh-recipe#recipes/deleteRecipe:result',
+        schema: _deepseek_ai_dsh_recipe_recipes_deleteRecipe_result$schema,
+      },
+      sourceLocation: {"file":"packages/task-flow/recipe/src/index.ts","line":360,"column":3},
+    },
     {
       id: '@deepseek-ai/dsh-recipe#recipes/getPinned',
       service: 'recipes',
@@ -333,6 +395,41 @@ export const TYPERT_REMOTE = {
         schema: _deepseek_ai_dsh_recipe_recipes_register_result$schema,
       },
       sourceLocation: {"file":"packages/task-flow/recipe/src/index.ts","line":170,"column":3},
+    },
+    {
+      id: '@deepseek-ai/dsh-recipe#recipes/updateRecipe',
+      service: 'recipes',
+      namespace: 'recipes',
+      method: 'updateRecipe',
+      invocation: { kind: 'direct' },
+      parameters: [
+        {
+          name: 'recipeId',
+          wire: 'recipeId',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@deepseek-ai/dsh-recipe#recipes/updateRecipe:recipeId',
+            schema: _deepseek_ai_dsh_recipe_recipes_register_parameter_0$schema,
+          },
+        },
+        {
+          name: 'payload',
+          wire: 'payload',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@deepseek-ai/dsh-recipe/types#RecipePayload',
+            schema: _deepseek_ai_dsh_recipe_recipes_register_parameter_2$schema,
+          },
+        },
+      ],
+      result: {
+        mode: 'strict',
+        typeSymbol: '@deepseek-ai/dsh-recipe/types#RecipeRevision',
+        schema: _deepseek_ai_dsh_recipe_recipes_register_result$schema,
+      },
+      sourceLocation: {"file":"packages/task-flow/recipe/src/index.ts","line":320,"column":3},
     },
   ],
 }

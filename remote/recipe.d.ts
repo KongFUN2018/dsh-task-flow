@@ -7,18 +7,24 @@ import type { RecipeIdentity, RecipePayload, RecipeRevision } from '../src/recip
 
 declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteNamespace$72656369706573 {
+    createRecipe: (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+    deleteRecipe: (recipeId: string) => Promise<RemoteResult<boolean>>
     getPinned: (identity: RecipeIdentity) => Promise<RemoteResult<RecipeRevision>>
     latest: (recipeId: string) => Promise<RemoteResult<RecipeRevision | undefined>>
     list: () => Promise<RemoteResult<RecipeIdentity[]>>
     listDetails: () => Promise<RemoteResult<RecipeRevision[]>>
     register: (recipeId: string, revision: number, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+    updateRecipe: (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
   }
   interface TypertRemoteMap {
+    'recipes/createRecipe': (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+    'recipes/deleteRecipe': (recipeId: string) => Promise<RemoteResult<boolean>>
     'recipes/getPinned': (identity: RecipeIdentity) => Promise<RemoteResult<RecipeRevision>>
     'recipes/latest': (recipeId: string) => Promise<RemoteResult<RecipeRevision | undefined>>
     'recipes/list': () => Promise<RemoteResult<RecipeIdentity[]>>
     'recipes/listDetails': () => Promise<RemoteResult<RecipeRevision[]>>
     'recipes/register': (recipeId: string, revision: number, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
+    'recipes/updateRecipe': (recipeId: string, payload: RecipePayload) => Promise<RemoteResult<RecipeRevision>>
   }
   interface TypertRemoteNamespaceMap {
     'recipes': TypertRemoteNamespace$72656369706573
