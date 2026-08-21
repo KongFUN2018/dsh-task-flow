@@ -126,6 +126,20 @@ export declare class RecipeEngineCore extends Service {
     private disposeSession;
     private disposeTaskSessions;
     private requireExecutor;
+    /**
+     * True when a scheduling error means "the phase's executor is not wired up
+     * yet" — a transient startup-ordering gap (the engine recovers before the
+     * phase-kind executors register) that must defer instead of aborting load.
+     * The per-kind aggregating executor raises its own error marker for an
+     * unregistered phase kind; treat it as a readiness gap.
+     */
+    private isDeferrableSchedulingError;
+    /**
+     * Re-run recovery for every live task. Executor registrants call this when
+     * a new phase-kind executor becomes available, so tasks that earlier
+     * deferred on a missing executor are scheduled now.
+     */
+    retryLive(): Promise<void>;
     private mutation;
 }
 export default RecipeEngineCore;

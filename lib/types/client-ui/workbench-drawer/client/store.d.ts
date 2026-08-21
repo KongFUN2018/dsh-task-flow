@@ -8,7 +8,7 @@
  */
 import { type EngineStoreHandle } from '@deepseek-ai/dsh-client-runtime/client';
 /** The drawer's tab ids; each dispatches one declared content seat. */
-export type DrawerTab = 'tasks' | 'taskList' | 'recipeLibrary' | 'inbox' | 'clarifications' | 'detail' | 'create';
+export type DrawerTab = 'tasks' | 'taskList' | 'inbox' | 'clarifications' | 'detail' | 'create';
 /** Baked write set over the drawer state (the defineStore actions table). */
 export type WorkbenchActions = {
     openDrawer: (d: WorkbenchState) => void;
@@ -19,6 +19,8 @@ export type WorkbenchActions = {
     setDetailTaskId: (d: WorkbenchState, taskId: string | undefined) => void;
     openCreate: (d: WorkbenchState, recipeId?: string) => void;
     setCreateRecipeId: (d: WorkbenchState, recipeId: string | undefined) => void;
+    openRecipes: (d: WorkbenchState) => void;
+    closeRecipes: (d: WorkbenchState) => void;
     back: (d: WorkbenchState) => void;
 };
 /** Drawer UI state shared between the trigger button and the panel. */
@@ -31,6 +33,8 @@ export type WorkbenchState = {
     detailTaskId: string | undefined;
     /** The recipe the create tab should pre-select, or undefined for a free pick. */
     createRecipeId: string | undefined;
+    /** Whether the standalone Recipe-library management modal is showing. */
+    recipesOpen: boolean;
     /** The browsing tab to return to after a drill-in (detail) or create closes. */
     returnTab: DrawerTab;
 };

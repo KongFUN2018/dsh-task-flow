@@ -7,6 +7,8 @@
  */
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client';
 import { type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client';
+import type { RemoteResult } from '@deepseek-ai/dsh-typert-protocol';
+import type { RecipePayload, RecipeRevision } from '../../../recipe/types.ts';
 /** Lifecycle of the recipe-catalogue load. */
 export type RecipeLibraryStatus = 'loading' | 'ready' | 'failed';
 /** Flat, renderable card view derived from one immutable recipe revision. */
@@ -52,5 +54,25 @@ export declare class RecipeLibraryController {
      * @returns when the load settles; failures land in the state's error.
      */
     refresh(): Promise<void>;
+    /**
+     * Create a new recipe family and refresh the catalogue.
+     * @param recipeId - the family id.
+     * @param payload - the revision-1 payload.
+     * @returns whether the create settled successfully.
+     */
+    createRecipe(recipeId: string, payload: RecipePayload): Promise<RemoteResult<RecipeRevision>>;
+    /**
+     * Update one recipe family (new immutable revision) and refresh.
+     * @param recipeId - the family id.
+     * @param payload - the replacement payload.
+     * @returns whether the update settled successfully.
+     */
+    updateRecipe(recipeId: string, payload: RecipePayload): Promise<RemoteResult<RecipeRevision>>;
+    /**
+     * Soft-delete one recipe family and refresh.
+     * @param recipeId - the family id.
+     * @returns whether the delete settled successfully.
+     */
+    deleteRecipe(recipeId: string): Promise<RemoteResult<boolean>>;
 }
 //# sourceMappingURL=recipeLibrary.d.ts.map

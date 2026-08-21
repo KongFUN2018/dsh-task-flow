@@ -3,3 +3,7 @@ node_modules/
 *.log
 .DS_Store
 .dsh-vision-toolkit/
+.memos-research/
+.memos-research.tar.gz
+.memos-src/
+.serena/
