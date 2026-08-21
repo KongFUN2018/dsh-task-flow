@@ -127,7 +127,18 @@ export class RecipeEngineCore extends Service {
     const prior = this.tails.get(key) ?? Promise.resolve()
     const run = prior.then(() => this.scheduleNow(taskId)).catch((error: unknown) => {
       if (error instanceof RecipeEngineError) {
+        // Permanently malformed scheduling intent, not a transient readiness
+        // gap: log and leave the chain quiescent (it will not self-retry).
         this.ctx.logger('recipe-engine').warn(`scheduling "${key}" stopped: ${error.message}`)
+        return
+      }
+      if (this.isDeferrableSchedulingError(error)) {
+        // A phase cannot be dispatched because its executor (or any executor)
+        // is not registered yet. Recovery runs eagerly at load, before the
+        // phase-kind executors are wired in; this is a transient readiness
+        // gap, not a failure. Defer and let a later executor registration
+        // wake the task again instead of aborting plugin load fatally.
+        this.ctx.logger('recipe-engine').info(`scheduling "${key}" deferred (executor not ready): ${(error as Error).message}`)
         return
       }
       throw error
@@ -345,10 +356,19 @@ export class RecipeEngineCore extends Service {
     binding: PhaseSessionBinding | undefined,
   ): Promise<void> {
     const executor = this.requireExecutor()
+    // Re-read the phase run fresh: recovery re-executes a crashed `running`
+    // phase, and the caller's snapshot can lag a concurrent mutation. Building
+    // the session-record mutation from a stale revision would trip the
+    // compare-and-set guard and fail the whole plugin load fatally.
+    phaseRun = (await this.ctx.tasks.getPhaseRun(String(phaseRun.phaseRunId))) ?? phaseRun
     const attempt = (binding?.attempt ?? 0) + 1
     const submissionId = this.submissionIdFor(phaseRun, attempt)
     const session = await this.openSession(phaseRun, phase, attempt, pinned.payload.phases[0]?.phaseId === phase.phaseId)
-    await this.ctx.tasks.recordPhaseSession(String(phaseRun.phaseRunId), session.sessionId, this.mutation(task.taskId, phaseRun.revision, 'record-session'))
+    // recordPhaseSession may commit a write (fresh session id), advancing the
+    // stored revision. Adopt the returned record so every later mutation in
+    // this execution (notably the error-path cancel) builds its compare-and-set
+    // guard against the current revision instead of this stale snapshot.
+    phaseRun = await this.ctx.tasks.recordPhaseSession(String(phaseRun.phaseRunId), session.sessionId, this.mutation(task.taskId, phaseRun.revision, 'record-session'))
     const next: PhaseSessionBinding = {
       phaseRunId: phaseRun.phaseRunId,
       taskId: task.taskId,
@@ -379,7 +399,16 @@ export class RecipeEngineCore extends Service {
       outcome = await runPromise
     } catch (error) {
       this.inFlight.delete(phaseKey)
-      await this.ctx.tasks.cancelPhaseRun(phaseKey, this.mutation(task.taskId, phaseRun.revision, 'cancel-after-executor-failure'))
+      // An executor-not-ready error is a transient startup-ordering gap, not a
+      // phase failure: cancelling the run here would make advancePhases treat
+      // it as a failed phase and fail the whole task, defeating the deferral.
+      // Leave the run non-terminal (it stays `running` or `created`) so a later
+      // executor registration wakes retryLive() and this phase re-executes.
+      if (!this.isDeferrableSchedulingError(error)) {
+        await this.ctx.tasks.cancelPhaseRun(phaseKey, this.mutation(task.taskId, phaseRun.revision, 'cancel-after-executor-failure'))
+      }
+      // Dispose the session that openSession already committed above; the
+      // retry path opens a fresh one when the executor becomes available.
       this.disposeSession(phaseKey)
       throw error
     }
@@ -611,6 +640,30 @@ export class RecipeEngineCore extends Service {
       throw new RecipeEngineError('no-executor', 'no phase executor registered (call ctx.recipeEngine.registerExecutor)')
     }
     return this.executor
+  }
+
+  /**
+   * True when a scheduling error means "the phase's executor is not wired up
+   * yet" — a transient startup-ordering gap (the engine recovers before the
+   * phase-kind executors register) that must defer instead of aborting load.
+   * The per-kind aggregating executor raises its own error marker for an
+   * unregistered phase kind; treat it as a readiness gap.
+   */
+  private isDeferrableSchedulingError(error: unknown): boolean {
+    if (typeof error !== 'object' || error === null || !('code' in error)) return false
+    const candidate = error as { code?: unknown; message?: unknown }
+    if (candidate.code !== 'no-executor' || typeof candidate.message !== 'string') return false
+    return candidate.message.startsWith('no executor registered for phase kind')
+      || candidate.message.includes('no phase executor registered')
+  }
+
+  /**
+   * Re-run recovery for every live task. Executor registrants call this when
+   * a new phase-kind executor becomes available, so tasks that earlier
+   * deferred on a missing executor are scheduled now.
+   */
+  retryLive(): Promise<void> {
+    return this.recover()
   }
 
   private mutation(taskId: TaskId, expectedRevision: number, action: string): TaskMutationContext {

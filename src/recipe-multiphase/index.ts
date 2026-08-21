@@ -11,6 +11,7 @@ import { Service } from '@deepseek-ai/cordis'
 import type { Context } from '@deepseek-ai/cordis'
 import '../recipe-engine-core/index.ts'
 import type { PhaseAssignment, PhaseExecutor, PhaseOutcome } from '../recipe-engine-core/types.ts'
+import type { RecipeEngineCore } from '../recipe-engine-core/index.ts'
 import { RecipeMultiphaseError } from './types.ts'
 
 export type * from './types.ts'
@@ -52,6 +53,13 @@ export class RecipeMultiphaseService extends Service {
     if (kind === '') throw new RecipeMultiphaseError('invalid-kind', 'phase kind must be a non-blank string')
     if (this.executors.has(kind)) throw new RecipeMultiphaseError('duplicate-kind', `an executor is already registered for phase kind "${kind}"`)
     this.executors.set(kind, executor)
+    // The engine recovers eagerly at startup, before executors are wired; a
+    // live phase whose kind had no executor defers scheduling instead of
+    // aborting. Waking recovery now lets that task resume dispatch. Defensive
+    // about a missing/mocked engine (isolated unit tests register executors
+    // without a real recipe-engine service).
+    const engine = this.ctx.recipeEngine as Partial<Pick<RecipeEngineCore, 'retryLive'>> | undefined
+    void engine?.retryLive?.()
     return () => {
       if (this.executors.get(kind) === executor) this.executors.delete(kind)
     }

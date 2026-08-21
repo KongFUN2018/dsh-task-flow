@@ -18,6 +18,7 @@ import type { TaskMutationContext } from '../src/task/types.ts'
 import WorkbenchJournalService from '../src/workbench/journal/index.ts'
 import LocalTaskService from '../src/task-local/index.ts'
 import RecipeEngineCore from '../src/recipe-engine-core/index.ts'
+import RecipeMultiphaseService from '../src/recipe-multiphase/index.ts'
 import {
   completedOutcome,
   stubAgentFactory,
@@ -358,5 +359,48 @@ describe('recipe engine core', () => {
     expect(mainRuns.some(run => run.state === 'stale')).toBe(true)
     const staledVerdicts = await h.tasks.listGateResults(String(mainRuns[0]!.activeSubmissionId))
     expect(staledVerdicts[0]?.stale).toBe(true)
+  })
+
+  it('defers a phase with no executor instead of failing the task, then resumes on registration', async () => {
+    // Reproduces the executor-readiness gap: the engine recovers eagerly at
+    // startup, before the per-kind executors are wired in. The multiphase
+    // aggregator raises 'no-executor' for an unregistered kind; the engine
+    // must defer (leave the phase run non-terminal, keep the task running)
+    // rather than cancel the run and fail the whole task. Registering the
+    // kind executor then wakes recovery and the phase completes.
+    const h = await harness()
+    current = h.ctx
+    const multiphase = new RecipeMultiphaseService(h.ctx)
+    const disposeAggregator = h.engine.registerExecutor(multiphase.aggregatingExecutor())
+
+    // Task on the built-in EMPTY_TEMPLATE (first phase kind 'default'), whose
+    // kind has no executor yet → must defer, not fail.
+    const created = await h.tasks.createTask(EMPTY_TEMPLATE_RECIPE_ID, 'w-1', 'unit', 'create-k')
+    await h.tasks.startTask(created.taskId, mutation(1))
+    // Give the engine a moment to attempt scheduling and hit the no-executor
+    // path; then confirm the task is still alive (not failed/cancelled).
+    await new Promise(resolve => setTimeout(resolve, 120))
+    const deferredKept = await h.tasks.getTask(created.taskId)
+    expect(['running', 'paused'].includes(deferredKept!.state)).toBe(true)
+    const phaseKept = (await h.tasks.listPhaseRuns(String(deferredKept!.currentRunId)))[0]
+    expect(phaseKept).toBeDefined()
+    expect(['created', 'running', 'scheduled'].includes(phaseKept!.state)).toBe(true)
+
+    // Register a 'default' kind executor → multiphase wakes retryLive → the
+    // deferred task resumes and completes.
+    const seen: string[] = []
+    multiphase.registerExecutor('default', {
+      name: 'default-executor',
+      async execute(assignment) {
+        seen.push(assignment.phase.kind)
+        return completedOutcome(assignment, h.deliverables)
+      },
+    })
+    await waitFor(async () => (await taskState(h, created.taskId)) === 'completed')
+    expect(seen).toEqual(['default'])
+    const done = await h.tasks.getTask(created.taskId)
+    const phases = await h.tasks.listPhaseRuns(String(done!.currentRunId))
+    expect(phases.some(run => run.state === 'passed')).toBe(true)
+    disposeAggregator()
   })
 })

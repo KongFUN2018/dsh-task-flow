@@ -139,7 +139,7 @@ export abstract class TaskHandle extends TypertRemoteService {
    * Register one completion guard: `completeTask` runs every registered guard
    * on the serial write chain after the state check passes; a throwing guard
    * rejects the command before any durable write. Contributors own their
-   * disposal �?the returned handle removes the guard.
+   * disposal �?the returned handle removes the guard.
    * @param guard - async veto over one task about to complete.
    * @returns the disposer that unregisters the guard.
    */
@@ -377,7 +377,7 @@ export abstract class TaskHandle extends TypertRemoteService {
   /**
    * Complete a task; the completion guard requires every phase run of the
    * current run to have passed (or retired into stale/superseded), then every
-   * registered M5 completion guard must approve �?unsigned B items, suspended
+   * registered M5 completion guard must approve �?unsigned B items, suspended
    * rewind decisions, and open blocking decisions veto here.
    * @param taskId - the task to complete.
    * @param mutation - actor, reason, expected revision, idempotency key.
@@ -601,7 +601,7 @@ export abstract class TaskHandle extends TypertRemoteService {
         submittedAt: Date.now(),
       }
       // The patch records the corrected revision in place and re-enters the
-      // gate (原地修正，Gate 将重�? for states that were awaiting a decision.
+      // gate (原地修正，Gate 将重�? for states that were awaiting a decision.
       const nextState = (phaseRun.state === 'awaiting-input' || phaseRun.state === 'awaiting-decision') ? 'gate-running' : phaseRun.state
       const nextPhase: PhaseRunRecord = {
         ...phaseRun,
@@ -687,7 +687,7 @@ export abstract class TaskHandle extends TypertRemoteService {
   /**
    * Mark one phase run stale: the M2 impact command. A stale run is
    * terminal; the engine re-opens the phase as a new run. Runs in `running`
-   * or `submitting` reject �?an in-flight atomic action settles per the M1
+   * or `submitting` reject �?an in-flight atomic action settles per the M1
    * quiescence contract.
    * @param phaseRunId - the phase run the impact closure covers.
    * @param mutation - the phase run's expected revision plus actor metadata.
@@ -702,7 +702,7 @@ export abstract class TaskHandle extends TypertRemoteService {
    * Retire one phase run into `superseded`: the M5 rewind command. A
    * superseded run is terminal and never blocks completion; unlike `stale`
    * (invalidated inputs), superseded means the whole branch lost to a newer
-   * run, so in-flight states retire too �?the rewind decision already
+   * run, so in-flight states retire too �?the rewind decision already
    * committed to abandoning the branch.
    * @param phaseRunId - the phase run the rewind retires.
    * @param mutation - the phase run's expected revision plus actor metadata.
@@ -938,8 +938,13 @@ export abstract class TaskHandle extends TypertRemoteService {
     const provenance = provenanceOf(mutation)
     return this.serialized(async () => {
       const phaseRun = await this.loadPhaseRunOrThrow(phaseRunId)
-      this.assertRevision(phaseRun, mutation)
+      // Idempotent by value: a replay that already carries the requested
+      // session id returns the stored record without a write, so it must not
+      // trip the compare-and-set revision guard. Recovery can re-open the same
+      // phase path after a restart; asserting the revision here would turn a
+      // harmless no-op replay into a fatal stale-revision failure at load.
       if (phaseRun.sessionId === sessionId) return phaseRun
+      this.assertRevision(phaseRun, mutation)
       const updated: PhaseRunRecord = {
         ...phaseRun,
         sessionId,
@@ -955,8 +960,10 @@ export abstract class TaskHandle extends TypertRemoteService {
     const provenance = provenanceOf(mutation)
     return this.serialized(async () => {
       const phaseRun = await this.loadPhaseRunOrThrow(phaseRunId)
-      this.assertRevision(phaseRun, mutation)
+      // Idempotent by value: a no-op replay returns the stored record without
+      // a write and must not trip the compare-and-set revision guard.
       if (phaseRun.schedulingFrozen === frozen) return phaseRun
+      this.assertRevision(phaseRun, mutation)
       const updated: PhaseRunRecord = {
         ...phaseRun,
         schedulingFrozen: frozen,
