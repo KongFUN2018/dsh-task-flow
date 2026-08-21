@@ -19,6 +19,18 @@ export type UiTaskCreateKey =
   | 'preview.empty'
   | 'create'
   | 'cancel'
+  | 'phase.kind.default'
+  | 'phase.kind.research'
+  | 'phase.kind.review'
+  | 'phase.kind.clarify'
+  | 'phase.kind.verify'
+  | 'phase.kind.normalize'
+  | 'phase.outputs'
+  | 'phase.noCriteria'
+  | 'gate.A'
+  | 'gate.B'
+  | 'gate.C'
+  | 'gate.breaker'
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh: Record<UiTaskCreateKey, string> = {
@@ -34,9 +46,21 @@ export const zh: Record<UiTaskCreateKey, string> = {
   'review.label': '审查策略',
   'review.detail': 'A 机器强制 · B 人工确认 · C 人工仲裁（默认折叠）',
   'recipe.meta': '{phases} 阶段 · {checks} 道闸 · {deliverables} 产物',
-  'preview.empty': '选中左侧模板查看流程预览',
+  'preview.empty': '选中上方模板查看流程预览',
   'create': '创建并开始第一阶段',
   'cancel': '取消',
+  'phase.kind.default': '通用',
+  'phase.kind.research': '调研',
+  'phase.kind.review': '评审',
+  'phase.kind.clarify': '澄清',
+  'phase.kind.verify': '核验',
+  'phase.kind.normalize': '规范化',
+  'phase.outputs': '产出',
+  'phase.noCriteria': '无提交验收标准',
+  'gate.A': 'A 机器强制',
+  'gate.B': 'B 人工确认',
+  'gate.C': 'C 人工仲裁',
+  'gate.breaker': '含熔断保护',
 }
 
 /** English dictionary, key-identical to the Chinese source of truth. */
@@ -53,7 +77,19 @@ export const en: Record<UiTaskCreateKey, string> = {
   'review.label': 'Review policy',
   'review.detail': 'A machine-mandatory · B human confirm · C human arbitration (folded by default)',
   'recipe.meta': '{phases} phases · {checks} checks · {deliverables} deliverables',
-  'preview.empty': 'Pick a recipe on the left to preview its phases',
+  'preview.empty': 'Pick a template above to preview its phases',
   'create': 'Create and start phase one',
   'cancel': 'Cancel',
+  'phase.kind.default': 'General',
+  'phase.kind.research': 'Research',
+  'phase.kind.review': 'Review',
+  'phase.kind.clarify': 'Clarify',
+  'phase.kind.verify': 'Verify',
+  'phase.kind.normalize': 'Normalize',
+  'phase.outputs': 'Outputs',
+  'phase.noCriteria': 'No submission criteria',
+  'gate.A': 'A · machine',
+  'gate.B': 'B · human confirm',
+  'gate.C': 'C · human arbitration',
+  'gate.breaker': 'circuit-breaker enabled',
 }
