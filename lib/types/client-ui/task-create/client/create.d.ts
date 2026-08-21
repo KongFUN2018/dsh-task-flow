@@ -13,6 +13,8 @@ export type CreateStatus = 'loading' | 'ready' | 'failed';
 export interface CreateState {
     readonly status: CreateStatus;
     readonly recipes: readonly RecipeRevision[];
+    /** Distinct workspace ids observed on existing tasks; the "known" options. */
+    readonly workspaces: readonly string[];
     readonly error?: string | undefined;
 }
 /**
@@ -25,6 +27,20 @@ export declare class TaskCreateController {
     constructor(ctx: ClientContext);
     /** Reload the recipe catalogue from the recipes Remote. */
     refresh(): Promise<void>;
+    /**
+     * Refresh the known-workspace candidates from the tasks catalogue. A
+     * workspace is currently a free-text id on each task record (no dedicated
+     * workspace domain), so "known" means every distinct workspaceId seen across
+     * existing tasks, plus the conventional `default`.
+     * @returns the distinct workspace id list, `default` first.
+     */
+    loadWorkspaces(): Promise<string[]>;
+    /**
+     * One-shot AI polish of the goal text through the host LLM.
+     * @param goal - raw user-entered goal text.
+     * @returns the clarified goal, or throws on failure (caller keeps the draft).
+     */
+    polish(goal: string): Promise<string>;
     /**
      * Create one task from the chosen recipe.
      * @param recipeId - the chosen recipe id, already in the catalogue.

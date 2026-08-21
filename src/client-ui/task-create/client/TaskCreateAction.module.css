@@ -223,6 +223,51 @@
   gap: 4px;
   font-size: 12px;
   color: var(--dsw-alias-label-secondary);
+  margin-bottom: 10px;
+}
+
+.goalCombo {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.goalInput {
+  width: 100%;
+  min-height: 88px;
+  padding: 8px 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-surface-l1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.goalInput:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.polishButton {
+  flex: none;
+  margin-top: 2px;
+}
+
+.workspaceInput {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-surface-l1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+}
+
+.workspaceInput:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
 }
 
 .review {

@@ -15,7 +15,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
   }
 }
 
-export const inject = ['slots', 'remote', 'remote.recipes', 'remote.tasks', 'locale']
+export const inject = ['slots', 'remote', 'remote.recipes', 'remote.tasks', 'remote.taskPolish', 'locale']
 
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-task-create: dictionaries')
@@ -24,9 +24,16 @@ export function apply(ctx: ClientContext): void {
     name: 'workbench.drawer.create',
     locale: NS,
     inject: () => ({
-      hooks: { create: controller.store },
+      hooks: {
+        create: controller.store,
+        // Custom (non-reserved) hook name — `workspaces` is a reserved standard
+        // `useWorkspaces` source, so this uses createWorkspaces→useCreateWorkspaces
+        // to surface the known-workspace candidates from the create state.
+        createWorkspaces: controller.store,
+      },
       refresh: () => { void controller.refresh() },
       create: (recipeId: string, workspaceId: string, goal: string) => controller.create(recipeId, workspaceId, 'workbench-ui', goal),
+      polish: (goal: string) => controller.polish(goal),
     }),
   }, TaskCreateAction))
 }

@@ -106,6 +106,9 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
       applyRewind: (itemId: string, taskRevision: number, actor: string, idempotencyKey: string) => Promise<RemoteResult<RewindApplication>>
       requestRewind: (taskId: string, rootVersionIds: string[], actor: string, idempotencyKey: string) => Promise<RemoteResult<RewindPreview & { itemId: string }>>
     }
+    'taskPolish': {
+      polish: (goal: string) => Promise<RemoteResult<string>>
+    }
   }
   interface TypertRemoteEventSelection {
     'task/updated': '_task-updated'

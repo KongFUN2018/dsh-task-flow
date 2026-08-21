@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Input } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { HostObservable, InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { RecipeGateCheckSpec, RecipePhaseSpec, RecipeRevision } from '../../../recipe/types.ts'
 import type { CreateState } from './create.ts'
@@ -7,9 +7,14 @@ import { NS } from './locales.ts'
 import css from './TaskCreateAction.module.css'
 
 export interface TaskCreateActionInjected {
-  hooks: { create: HostObservable<CreateState> }
+  hooks: {
+    create: HostObservable<CreateState>
+    createWorkspaces: HostObservable<CreateState>
+  }
   refresh: () => void
   create: (recipeId: string, workspaceId: string, goal: string) => Promise<string>
+  /** On-demand AI polish of task-goal text; user-initiated, never auto-run. */
+  polish: (goal: string) => Promise<string>
 }
 
 export type TaskCreateActionProps =
@@ -47,19 +52,36 @@ function kindLabel(t: (key: string, params?: Record<string, string>) => string, 
  * follow-up iteration; the current model is a serial phase pipeline.
  */
 export function TaskCreateAction(props: TaskCreateActionProps) {
-  const { t, openDetail, initialRecipeId, useCreate, create } = props
-  // Looser translate handle for runtime-computed keys (phase.kind.<custom>).
+  const { t, openDetail, initialRecipeId, useCreate, useCreateWorkspaces, create, polish } = props
   const tr = t as (key: string, params?: Record<string, string>) => string
   const state = useCreate(state => state)
+  const workspaces = useCreateWorkspaces(state => state.workspaces)
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
+  const [workspace, setWorkspace] = useState('default')
   const [goal, setGoal] = useState('')
   const [busy, setBusy] = useState(false)
+  const [polishing, setPolishing] = useState(false)
   useEffect(() => {
     // Pre-select the recipe the Recipe-library chose; ignore an empty initial
     // id so a direct entry into the wizard starts free.
     if (initialRecipeId !== undefined) setSelectedId(String(initialRecipeId))
   }, [initialRecipeId])
   const selected = state.recipes.find(recipe => recipe.recipeId === selectedId)
+
+  // On-demand AI polish of the goal text; user-initiated only.
+  const polishGoal = async () => {
+    const draft = goal.trim()
+    if (draft === '' || polishing) return
+    setPolishing(true)
+    try {
+      const refined = await polish(draft)
+      setGoal(refined)
+    } catch {
+      // keep the user's draft untouched on failure; the button re-enables.
+    } finally {
+      setPolishing(false)
+    }
+  }
 
   return (
     <div className={css.panel}>
@@ -150,11 +172,41 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
         <h3 className={css.section}>{t('column.config')}</h3>
         <label className={css.field}>
           <span>{t('goal.label')}</span>
-          <Input value={goal} onChange={(event) => { setGoal(event.target.value) }} placeholder={t('goal.placeholder')} />
+          <div className={css.goalCombo}>
+            <textarea
+              className={css.goalInput}
+              value={goal}
+              onChange={(event) => { setGoal(event.target.value) }}
+              placeholder={t('goal.placeholder')}
+              spellCheck={false}
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              className={css.polishButton}
+              disabled={polishing || goal.trim() === ''}
+              onClick={() => { void polishGoal() }}
+              title={t('polish.title')}
+            >
+              {polishing ? t('polish.busy') : t('polish.label')}
+            </Button>
+          </div>
         </label>
         <label className={css.field}>
           <span>{t('workspace.label')}</span>
-          <Input value="default" readOnly />
+          {/* Combobox: pick a known workspace from the datalist or type a new
+              one (a workspace is a free-text id on the task record). */}
+          <input
+            className={css.workspaceInput}
+            list="task-create-workspaces"
+            value={workspace}
+            onChange={(event) => { setWorkspace(event.target.value) }}
+            placeholder={t('workspace.placeholder')}
+            spellCheck={false}
+          />
+          <datalist id="task-create-workspaces">
+            {workspaces.map(id => <option key={id} value={id} />)}
+          </datalist>
         </label>
         <details className={css.review}>
           <summary>{t('review.label')}</summary>
@@ -164,7 +216,7 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
 
       {state.status !== 'loading' && (
         <div className={css.footer}>
-          <Button size="sm" variant="ghost" onClick={() => { setSelectedId(undefined); setGoal('') }}>{t('cancel')}</Button>
+          <Button size="sm" variant="ghost" onClick={() => { setSelectedId(undefined); setGoal(''); setWorkspace('default') }}>{t('cancel')}</Button>
           <Button
             size="sm"
             variant="primary"
@@ -172,10 +224,11 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
             onClick={() => {
               if (selected === undefined) return
               setBusy(true)
-              void create(selected.recipeId, 'default', goal).then((taskId) => {
+              void create(selected.recipeId, workspace.trim() === '' ? 'default' : workspace.trim(), goal).then((taskId) => {
                 setBusy(false)
                 setSelectedId(undefined)
                 setGoal('')
+                setWorkspace('default')
                 openDetail(taskId)
               }).catch(() => { setBusy(false) })
             }}

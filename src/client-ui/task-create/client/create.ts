@@ -18,6 +18,8 @@ export type CreateStatus = 'loading' | 'ready' | 'failed'
 export interface CreateState {
   readonly status: CreateStatus
   readonly recipes: readonly RecipeRevision[]
+  /** Distinct workspace ids observed on existing tasks; the "known" options. */
+  readonly workspaces: readonly string[]
   readonly error?: string | undefined
 }
 
@@ -40,18 +42,55 @@ export class TaskCreateController {
 
   constructor(ctx: ClientContext) {
     this.ctx = ctx
-    this.store = createSnapshotStore<CreateState>({ status: 'loading', recipes: [] })
+    this.store = createSnapshotStore<CreateState>({ status: 'loading', recipes: [], workspaces: [] })
     void this.refresh()
+    void this.loadWorkspaces()
   }
 
   /** Reload the recipe catalogue from the recipes Remote. */
   async refresh(): Promise<void> {
     const result = await this.ctx.remote.recipes.listDetails()
     if (!result.ok) {
-      this.store.set({ status: 'failed', recipes: [], error: result.error.code })
+      this.store.set({
+        status: 'failed', recipes: [], workspaces: this.store.getSnapshot().workspaces, error: result.error.code,
+      })
       return
     }
-    this.store.set({ status: 'ready', recipes: result.value, error: undefined })
+    this.store.set({ status: 'ready', recipes: result.value, workspaces: this.store.getSnapshot().workspaces, error: undefined })
+  }
+
+  /**
+   * Refresh the known-workspace candidates from the tasks catalogue. A
+   * workspace is currently a free-text id on each task record (no dedicated
+   * workspace domain), so "known" means every distinct workspaceId seen across
+   * existing tasks, plus the conventional `default`.
+   * @returns the distinct workspace id list, `default` first.
+   */
+  async loadWorkspaces(): Promise<string[]> {
+    const tasks = await this.ctx.remote.tasks.listTasks()
+    const seen = new Set<string>()
+    if (!seen.has('default')) seen.add('default')
+    const ordered: string[] = ['default']
+    for (const task of tasks.ok ? tasks.value : []) {
+      const id = task.workspaceId.trim()
+      if (id.length > 0 && !seen.has(id)) {
+        seen.add(id)
+        ordered.push(id)
+      }
+    }
+    this.store.set({ ...this.store.getSnapshot(), workspaces: ordered })
+    return ordered
+  }
+
+  /**
+   * One-shot AI polish of the goal text through the host LLM.
+   * @param goal - raw user-entered goal text.
+   * @returns the clarified goal, or throws on failure (caller keeps the draft).
+   */
+  async polish(goal: string): Promise<string> {
+    const result = await this.ctx.remote.taskPolish.polish(goal)
+    if (!result.ok) throw new Error('polish failed: ' + result.error.code)
+    return result.value
   }
 
   /**

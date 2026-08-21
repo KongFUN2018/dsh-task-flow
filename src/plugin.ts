@@ -41,6 +41,7 @@ import MetricsService from './metrics/index.ts'
 import GateService from './gate/index.ts'
 import LocalTaskService from './task-local/index.ts'
 import RecipeEngineCore from './recipe-engine-core/index.ts'
+import TaskPolishService from './task-polish/index.ts'
 import * as taskCreate from './tool-task-create/index.ts'
 
 /** Plugin display name: the `dsh web` fiber identity on the mounted host. */
@@ -52,7 +53,7 @@ export const name = 'dsh-task-flow-host'
  * PENDING until the host exposes all of them, so every `ctx.plugin(...)`
  * below resolves without a dangling service probe.
  */
-export const inject = ['storageDomain', 'sessions', 'agents', 'goals', 'tools']
+export const inject = ['storageDomain', 'sessions', 'agents', 'goals', 'tools', 'llm']
 
 /** The 19 folded domains in official base-bundle assembly order (registration). */
 const HOST_DOMAINS: readonly Plugin[] = [
@@ -75,6 +76,7 @@ const HOST_DOMAINS: readonly Plugin[] = [
   taskCreate,
   LocalTaskService,
   RecipeEngineCore,
+  TaskPolishService,
 ]
 
 /**

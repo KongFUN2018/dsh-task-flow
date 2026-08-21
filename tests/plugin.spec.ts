@@ -48,6 +48,13 @@ async function bootHost(registerHost: boolean): Promise<Context> {
   await ctx.plugin(GoalService)
   await ctx.plugin(SessionStore)
   await ctx.plugin(ToolRuntime)
+  // Minimal `llm` platform service: the host subsystem only needs it on the
+  // wire for the task-polish namespace activation; nothing here issues a call.
+  ctx.provide('llm', {
+    listProviders: () => [],
+    listModels: async () => [],
+    prepareCall: async () => { throw new Error('not exercised') },
+  })
   if (registerHost) {
     const unwrapped = unwrapExports(root)
     await ctx.plugin(unwrapped).await()
@@ -68,7 +75,7 @@ describe('dsh-task-flow host assembly', () => {
     const unwrapped = unwrapExports(root) as Record<string, unknown>
     expect(unwrapped).toBe(root)
     expect(unwrapped.name).toBe('dsh-task-flow-host')
-    expect(unwrapped.inject).toEqual(['storageDomain', 'sessions', 'agents', 'goals', 'tools'])
+    expect(unwrapped.inject).toEqual(['storageDomain', 'sessions', 'agents', 'goals', 'tools', 'llm'])
     expect(typeof unwrapped.apply).toBe('function')
     // The load-path guard: unwrapExports must NOT collapse onto RecipeRegistry.
     expect(unwrapped).not.toBe(RecipeRegistry)
@@ -86,6 +93,7 @@ describe('dsh-task-flow host assembly', () => {
       digest: ctx.digest,
       metrics: ctx.metrics,
       rewind: ctx.rewind,
+      taskPolish: ctx.taskPolish,
     }
     for (const [key, service] of Object.entries(services)) {
       expect(service, `${key} must be a live host service`).toBeDefined()
@@ -123,5 +131,6 @@ describe('dsh-task-flow host assembly', () => {
     expect(typeof ctx.metrics.taskMetrics).toBe('function')
     expect(typeof ctx.rewind.applyRewind).toBe('function')
     expect(typeof ctx.workbenchHostStream.listIncremental).toBe('function')
+    expect(typeof ctx.taskPolish.polish).toBe('function')
   })
 })

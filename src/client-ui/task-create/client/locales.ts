@@ -31,6 +31,10 @@ export type UiTaskCreateKey =
   | 'gate.B'
   | 'gate.C'
   | 'gate.breaker'
+  | 'workspace.placeholder'
+  | 'polish.label'
+  | 'polish.busy'
+  | 'polish.title'
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh: Record<UiTaskCreateKey, string> = {
@@ -61,6 +65,10 @@ export const zh: Record<UiTaskCreateKey, string> = {
   'gate.B': 'B 人工确认',
   'gate.C': 'C 人工仲裁',
   'gate.breaker': '含熔断保护',
+  'workspace.placeholder': '选择已有工作区，或输入新工作区名…',
+  'polish.label': 'AI 优化',
+  'polish.busy': '整理中…',
+  'polish.title': '用 AI 把任务目标整理得更清晰、具体',
 }
 
 /** English dictionary, key-identical to the Chinese source of truth. */
@@ -92,4 +100,8 @@ export const en: Record<UiTaskCreateKey, string> = {
   'gate.B': 'B · human confirm',
   'gate.C': 'C · human arbitration',
   'gate.breaker': 'circuit-breaker enabled',
+  'workspace.placeholder': 'Pick an existing workspace, or type a new one…',
+  'polish.label': 'AI polish',
+  'polish.busy': 'Polishing…',
+  'polish.title': 'Ask AI to clarify and sharpen the task goal',
 }

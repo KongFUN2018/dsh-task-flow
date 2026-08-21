@@ -4,9 +4,12 @@ import { NS } from './locales.ts';
 export interface TaskCreateActionInjected {
     hooks: {
         create: HostObservable<CreateState>;
+        createWorkspaces: HostObservable<CreateState>;
     };
     refresh: () => void;
     create: (recipeId: string, workspaceId: string, goal: string) => Promise<string>;
+    /** On-demand AI polish of task-goal text; user-initiated, never auto-run. */
+    polish: (goal: string) => Promise<string>;
 }
 export type TaskCreateActionProps = PropsRuntime<'workbench.drawer.create'> & PropsLocale<typeof NS> & InjectFace<TaskCreateActionInjected>;
 /**
