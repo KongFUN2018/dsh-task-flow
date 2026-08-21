@@ -26,3 +26,21 @@
 ## 后续迭代需求（待办看板）
 
 - **流程预览支持分支 DAG**：当前 Recipe 数据模型为线性 phases 串行（复杂度体现在每阶段的 A/B/C 门与阶段 kind 上）。已按用户确认先做「线性流程+门精致可视化」；「真正的条件分支/流程跳转（DAG）」作为后续版本迭代优化项，需扩展数据模型（涉 M1 冻结契约），暂不在 UI 层硬做。
+
+## 已完成迭代（迭代记录）
+
+### 新建向导「3 · 目标与配置」升级（commit `a5ecc1f`）
+
+用户反馈后做的三件套：
+
+1. **任务目标 → 多行 textarea**：`.goalInput`（min-height 88px），支持详细目标文本。
+2. **Workspace 可选已有 / 可输新增**：原生 `<input list>` + `<datalist>` combobox；候选来自 `controller.loadWorkspaces()`（`tasks.listTasks()` 去重非空 `workspaceId`，恒置 `'default'` 前置）。修复了「无法选已有/建新 workspace」缺陷。
+3. **AI 优化目标按钮（用户手动触发，绝不自动）**：
+   - 前端：`.goalCombo` 内右对齐按钮，`polishing` 状态防重复点；失败静默保留用户草稿。
+   - 后端：新增 `src/task-polish/index.ts` —— `TaskPolishService`（`@Remote('polish')`），`ctx.llm` 现有路由自动选首个 provider + 其首个 model，流式累积文本。
+
+**关键实现决策（维护时留意）**
+- `@Remote('polish')` 由 typert Gate 的 **source-mode discovery** 在运行时注册 `taskPolish` namespace，**不需要**手动伪造 `remote/taskPolish.js` 生成物（那只是 npm 发布子路径，generator 在 harness monorepo 内）→ 未加 `./remote/taskPolish` package.json 导出，运行特性不依赖它。
+- 自定义 hooks 命名**必须避让 slots 渲染器保留标准 hook**：`useWorkspaces` 是标准 hook（类型固定 `WorkspaceListState`），所以自定义候选源用 `createWorkspaces` → `useCreateWorkspaces`。若将来再用 workspace 列表源，别重蹈覆辙。
+- 外层 plugin `inject` 增加 `llm`；`TaskPolishService` 自身 `static inject = ['llm']`。测试里 `plugin.spec.ts` 的 `bootHost` 提供最小 llm stub（断言 namespace 激活/方法存在，不真调用 LLM）。
+
