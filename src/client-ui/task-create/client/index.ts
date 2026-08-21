@@ -26,10 +26,8 @@ export function apply(ctx: ClientContext): void {
     inject: () => ({
       hooks: {
         create: controller.store,
-        // Custom (non-reserved) hook name — `workspaces` is a reserved standard
-        // `useWorkspaces` source, so this uses createWorkspaces→useCreateWorkspaces
-        // to surface the known-workspace candidates from the create state.
-        createWorkspaces: controller.store,
+        // Real workspace candidates ride the harness standard `useWorkspaces`
+        // feed (GlobalStandardProps); no custom workspace hook needed.
       },
       refresh: () => { void controller.refresh() },
       create: (recipeId: string, workspaceId: string, goal: string) => controller.create(recipeId, workspaceId, 'workbench-ui', goal),

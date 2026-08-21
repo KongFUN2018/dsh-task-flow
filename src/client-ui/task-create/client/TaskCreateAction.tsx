@@ -9,7 +9,6 @@ import css from './TaskCreateAction.module.css'
 export interface TaskCreateActionInjected {
   hooks: {
     create: HostObservable<CreateState>
-    createWorkspaces: HostObservable<CreateState>
   }
   refresh: () => void
   create: (recipeId: string, workspaceId: string, goal: string) => Promise<string>
@@ -52,10 +51,12 @@ function kindLabel(t: (key: string, params?: Record<string, string>) => string, 
  * follow-up iteration; the current model is a serial phase pipeline.
  */
 export function TaskCreateAction(props: TaskCreateActionProps) {
-  const { t, openDetail, initialRecipeId, useCreate, useCreateWorkspaces, create, polish } = props
+  const { t, openDetail, initialRecipeId, useCreate, useWorkspaces, create, polish } = props
   const tr = t as (key: string, params?: Record<string, string>) => string
   const state = useCreate(state => state)
-  const workspaces = useCreateWorkspaces(state => state.workspaces)
+  // Real harness workspaces (standard feed; independent baseline lifecycle).
+  const workspacesHost = useWorkspaces(snapshot => snapshot)
+  const workspaceItems = workspacesHost.items
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
   const [workspace, setWorkspace] = useState('default')
   const [goal, setGoal] = useState('')
@@ -67,6 +68,15 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
     if (initialRecipeId !== undefined) setSelectedId(String(initialRecipeId))
   }, [initialRecipeId])
   const selected = state.recipes.find(recipe => recipe.recipeId === selectedId)
+
+  // Map a displayed candidate (or free-typed value) back to the durable
+  // harness workspace id (a UUID). Matching by title is the readable path; an
+  // unmatched free-typed value falls back to the conventional `default`.
+  const workspaceIdFor = (candidate: string): string => {
+    const trimmed = candidate.trim()
+    const owned = workspaceItems.find(item => item.title === trimmed)
+    return owned !== undefined ? String(owned.workspaceId) : (trimmed === '' ? 'default' : trimmed)
+  }
 
   // On-demand AI polish of the goal text; user-initiated only.
   const polishGoal = async () => {
@@ -194,8 +204,9 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
         </label>
         <label className={css.field}>
           <span>{t('workspace.label')}</span>
-          {/* Combobox: pick a known workspace from the datalist or type a new
-              one (a workspace is a free-text id on the task record). */}
+          {/* Combobox over the real harness workspaces: pick one (its title
+              shows; create() maps it back to the durable workspace id) or
+              type a free value as a fallback identifier. */}
           <input
             className={css.workspaceInput}
             list="task-create-workspaces"
@@ -205,7 +216,7 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
             spellCheck={false}
           />
           <datalist id="task-create-workspaces">
-            {workspaces.map(id => <option key={id} value={id} />)}
+            {workspaceItems.map(item => <option key={String(item.workspaceId)} value={item.title} />)}
           </datalist>
         </label>
         <details className={css.review}>
@@ -224,7 +235,7 @@ export function TaskCreateAction(props: TaskCreateActionProps) {
             onClick={() => {
               if (selected === undefined) return
               setBusy(true)
-              void create(selected.recipeId, workspace.trim() === '' ? 'default' : workspace.trim(), goal).then((taskId) => {
+              void create(selected.recipeId, workspaceIdFor(workspace), goal).then((taskId) => {
                 setBusy(false)
                 setSelectedId(undefined)
                 setGoal('')

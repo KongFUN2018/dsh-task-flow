@@ -34,13 +34,14 @@
 用户反馈后做的三件套：
 
 1. **任务目标 → 多行 textarea**：`.goalInput`（min-height 88px），支持详细目标文本。
-2. **Workspace 可选已有 / 可输新增**：原生 `<input list>` + `<datalist>` combobox；候选来自 `controller.loadWorkspaces()`（`tasks.listTasks()` 去重非空 `workspaceId`，恒置 `'default'` 前置）。修复了「无法选已有/建新 workspace」缺陷。
+2. **Workspace 可选已有 / 可输新增**：原生 `<input list>` + `<datalist>` combobox；候选来自 **harness 真实 workspace**（标准 `useWorkspaces` feed，`WorkspaceListState.items: WorkspaceView[]`），显示 `title`、选中/存储用 harness workspace 的 `workspaceId`（UUID）；`create()` 把 title 映射回 `workspaceId`，未匹配的自由输入兜底 `'default'`。
+   - **修复「下拉只有 default」缺陷**：最初的错误做法是从 `tasks.listTasks()` 收集 `TaskRecord.workspaceId` 轨迹（那只是任务里出现过的值，非真实工作区）。正确数据源是 harness 的 `ctx.workspaces`（client-runtime 服务层）/ 标准 `useWorkspaces`。
 3. **AI 优化目标按钮（用户手动触发，绝不自动）**：
    - 前端：`.goalCombo` 内右对齐按钮，`polishing` 状态防重复点；失败静默保留用户草稿。
    - 后端：新增 `src/task-polish/index.ts` —— `TaskPolishService`（`@Remote('polish')`），`ctx.llm` 现有路由自动选首个 provider + 其首个 model，流式累积文本。
 
 **关键实现决策（维护时留意）**
 - `@Remote('polish')` 由 typert Gate 的 **source-mode discovery** 在运行时注册 `taskPolish` namespace，**不需要**手动伪造 `remote/taskPolish.js` 生成物（那只是 npm 发布子路径，generator 在 harness monorepo 内）→ 未加 `./remote/taskPolish` package.json 导出，运行特性不依赖它。
-- 自定义 hooks 命名**必须避让 slots 渲染器保留标准 hook**：`useWorkspaces` 是标准 hook（类型固定 `WorkspaceListState`），所以自定义候选源用 `createWorkspaces` → `useCreateWorkspaces`。若将来再用 workspace 列表源，别重蹈覆辙。
+- **workspace 候选直接用标准 `useWorkspaces`**（`GlobalStandardProps` 注入给每个全局 slot 组件，类型 `WorkspaceListState`），**不要**自定义 workspace 源 hook。早期因未理解这是 harness 保留 feed 而自定义了 `createWorkspaces` → `useCreateWorkspaces`，现已删除，统一走标准 hook，避免重复造轮子、也避免与渲染器标准 hook 名冲突。
 - 外层 plugin `inject` 增加 `llm`；`TaskPolishService` 自身 `static inject = ['llm']`。测试里 `plugin.spec.ts` 的 `bootHost` 提供最小 llm stub（断言 namespace 激活/方法存在，不真调用 LLM）。
 
