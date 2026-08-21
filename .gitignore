@@ -6,4 +6,5 @@ node_modules/
 .memos-research/
 .memos-research.tar.gz
 .memos-src/
+.memsearch/
 .serena/

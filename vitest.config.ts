@@ -41,6 +41,14 @@ function standardDecoratorPlugin() {
 export default defineConfig({
   plugins: [standardDecoratorPlugin()],
   test: {
-    include: ['tests/**/*.spec.ts'],
+    include: ['tests/**/*.{spec,test}.{ts,tsx}'],
+    css: true,
+  },
+  resolve: {
+    alias: {
+      // Avoid importing the real primitives (which bare-import katex CSS that
+      // Vitest can't transform) in render tests; use the fixture stub.
+      '@deepseek-ai/dsh-client-ui-primitives': new URL('./tests/fixtures/primitives-stub.tsx', import.meta.url).pathname,
+    },
   },
 })

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { HostObservable, InjectFace, PropsLocale, PropsRuntime, TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import type { RecipeCard, RecipeLibraryState } from './recipeLibrary.ts'
@@ -106,30 +106,32 @@ function RecipeEditor({ open, title, initialId, draft, saving, error, onClose, o
 }) {
   const [recipeId, setRecipeId] = useState(initialId)
   const [json, setJson] = useState(() => JSON.stringify(draft, null, 2))
-  const [parseError, setParseError] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     if (open) {
       setRecipeId(initialId)
       setJson(JSON.stringify(draft, null, 2))
-      setParseError(undefined)
     }
   }, [open, initialId, draft])
 
-  const payload = ((): RecipePayload | undefined => {
+  // Derive the parsed payload and its validity instead of writing state during
+  // render. The previous implementation called setParseError inside a render
+  // IIFE, which triggered an endless re-render loop and aborted the whole slot
+  // (opening the editor crashed with a minified error). The error line is now
+  // a pure function of `json`.
+  const parsed = useMemo(() => {
     try {
-      const parsed = JSON.parse(json)
-      if (typeof parsed !== 'object' || parsed === null || !Array.isArray(parsed.phases)) {
-        setParseError('payload must be an object with a `phases` array')
-        return undefined
+      const value = JSON.parse(json)
+      if (typeof value !== 'object' || value === null || !Array.isArray((value as { phases?: unknown }).phases)) {
+        return { payload: undefined, invalid: 'payload must be an object with a `phases` array' }
       }
-      setParseError(undefined)
-      return parsed as RecipePayload
+      return { payload: value as RecipePayload, invalid: undefined }
     } catch {
-      setParseError('invalid JSON')
-      return undefined
+      return { payload: undefined, invalid: 'invalid JSON' }
     }
-  })()
+  }, [json])
+  const payload = parsed.payload
+  const parseError = parsed.invalid
 
   return (
     <Modal
