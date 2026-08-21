@@ -22,3 +22,7 @@
 
 - `tsc -p tsconfig.json`（产出 `lib/types`）→ `tsdown`（打包 `lib/*`）→ `vitest run`。
 - 本项目目录约定：`src/`（源码）、`lib/`（构建产物）、`remote/`（typert 远端描述符，生成物）、`tests/`（vitest 测试）、`.serena/`（Serena 项目记忆）。
+
+## 后续迭代需求（待办看板）
+
+- **流程预览支持分支 DAG**：当前 Recipe 数据模型为线性 phases 串行（复杂度体现在每阶段的 A/B/C 门与阶段 kind 上）。已按用户确认先做「线性流程+门精致可视化」；「真正的条件分支/流程跳转（DAG）」作为后续版本迭代优化项，需扩展数据模型（涉 M1 冻结契约），暂不在 UI 层硬做。
